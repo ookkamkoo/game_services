@@ -40,8 +40,8 @@ jobs:
         run: |
           sshpass -p ${{ secrets.SSH_PASSWORD }} ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} '
             echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-            docker stop game_services
-            docker rm game_services
+            docker stop game_services_1
+            docker rm game_services_1
             docker pull littleweb14766/project_csn:game_services_1
             docker-compose up -d
             '
