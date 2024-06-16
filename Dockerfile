@@ -10,7 +10,7 @@ RUN go build -o /go/bin/app -v ./
 FROM alpine:latest
 RUN apk --no-cache add ca-certificates
 COPY --from=builder /go/bin/app /app
-COPY .env /
+# COPY .env /
 ENTRYPOINT /app
 LABEL Name=project Version=0.0.1
 EXPOSE 3001
