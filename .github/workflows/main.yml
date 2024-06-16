@@ -32,7 +32,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_NAME }}/project_csn:game_servicesgame_services
+          tags: ${{ secrets.DOCKER_NAME }}/project_csn:game_services_1
       
 
       #Update file
@@ -42,8 +42,8 @@ jobs:
             echo "${{ secrets.DOCKER_USERNAME }}" | docker login -u "${{ secrets.DOCKER_PASSWORD }}" --password-stdin
             docker stop backend
             docker rm backend
-            docker pull littleweb14766/project_csn:game_servicesgame_services
-            docker run -d --name backend -p 3003:3003 littleweb14766/project_csn:game_servicesgame_services
+            docker pull littleweb14766/project_csn:game_services_1
+            docker run -d --name backend -p 3003:3003 littleweb14766/project_csn:game_services_1
             '
 
 
