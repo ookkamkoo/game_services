@@ -40,10 +40,10 @@ jobs:
         run: |
           sshpass -p ${{ secrets.SSH_PASSWORD }} ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} '
             echo "${{ secrets.DOCKER_USERNAME }}" | docker login -u "${{ secrets.DOCKER_PASSWORD }}" --password-stdin
-            docker stop backend
-            docker rm backend
+            docker stop game_services
+            docker rm game_services
             docker pull littleweb14766/project_csn:game_services_1
-            docker run -d --name backend -p 3003:3003 littleweb14766/project_csn:game_services_1
+            docker run -d --name game_services -p 3003:3003 littleweb14766/project_csn:game_services_1
             '
 
 
