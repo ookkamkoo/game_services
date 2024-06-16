@@ -34,14 +34,8 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_NAME }}/project_csn:game_servicesgame_services
       
-      #Connect SSH
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-      
 
-      #Update file s
+      #Update file
       - name: Update Docker container
         run: |
           sshpass -p ${{ secrets.SSH_PASSWORD }} ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} '
