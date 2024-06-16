@@ -28,11 +28,11 @@ func main() {
 	// database.Connect()
 	// err := godotenv.Load()
 
-	if err != nil {
-		log.Fatal("Error loading env")
-		log.Fatal(err)
+	// if err != nil {
+	// 	log.Fatal("Error loading env")
+	// 	log.Fatal(err)
 
-	}
+	// }
 
 	if err := database.PG_Connect(); err != nil {
 		log.Fatal(err)
