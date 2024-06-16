@@ -43,7 +43,7 @@ jobs:
             docker stop game_services_1
             docker rm game_services_1
             docker pull littleweb14766/project_csn:game_services_1
-            docker-compose up -d
+            cd /var/www/ && docker-compose up -d
             '
 # docker run -d --name game_services -p 3003:3003 littleweb14766/project_csn:game_services_1
 
