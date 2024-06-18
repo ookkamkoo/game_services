@@ -9,5 +9,9 @@ import (
 func SetRoute(app *fiber.App) {
 	gameProvider := app.Group("/game-provider")
 	gameProvider.Post("/", controllers.GameProvider)
-	gameProvider.Post("/aa", controllers.GameProviderAA)
+	gameProvider.Get("/aa", controllers.GameProviderAA)
+
+	api := app.Group("/api")
+	api.Post("/launch", controllers.LaunchProvider)
+	api.Post("/Products/:id", controllers.ProductsByCategory)
 }
