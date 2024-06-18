@@ -1,7 +1,14 @@
 package utils
 
 import (
+	"crypto/aes"
+	"crypto/cipher"
+	"crypto/rand"
+	"encoding/base64"
+	"encoding/hex"
+	"errors"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"time"
@@ -43,4 +50,68 @@ func SuccessResponse(c *fiber.Ctx, data interface{}, message string) error {
 		"data":    data,
 		"time":    time.Now().Format("2006-01-02 15:04:05"),
 	})
+}
+
+func Encrypt(text string, key string) (string, error) {
+	if len(key) != 32 {
+		return "", errors.New("key must be 32 bytes long")
+	}
+
+	iv := make([]byte, aes.BlockSize) // Initialization vector
+	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
+		return "", err
+	}
+
+	block, err := aes.NewCipher([]byte(key))
+	if err != nil {
+		return "", err
+	}
+
+	ciphertext := make([]byte, len(text))
+	stream := cipher.NewCFBEncrypter(block, iv)
+	stream.XORKeyStream(ciphertext, []byte(text))
+
+	// Combine IV and encrypted text
+	result := fmt.Sprintf("%s:%s", hex.EncodeToString(iv), hex.EncodeToString(ciphertext))
+	return base64.StdEncoding.EncodeToString([]byte(result)), nil
+}
+
+// Decrypt decrypts the encrypted text using AES-256-CBC algorithm.
+func Decrypt(encryptedText string, key string) (string, error) {
+	if len(key) != 32 {
+		return "", errors.New("key must be 32 bytes long")
+	}
+
+	decoded, err := base64.StdEncoding.DecodeString(encryptedText)
+	if err != nil {
+		return "", err
+	}
+
+	parts := string(decoded)
+	ivHex := parts[:32]
+	encrypted := parts[33:]
+
+	iv, err := hex.DecodeString(ivHex)
+	if err != nil {
+		return "", err
+	}
+
+	if len(iv) != aes.BlockSize {
+		return "", errors.New("IV must be 16 bytes long")
+	}
+
+	block, err := aes.NewCipher([]byte(key))
+	if err != nil {
+		return "", err
+	}
+
+	ciphertext, err := hex.DecodeString(encrypted)
+	if err != nil {
+		return "", err
+	}
+
+	stream := cipher.NewCFBDecrypter(block, iv)
+	stream.XORKeyStream(ciphertext, ciphertext)
+
+	return string(ciphertext), nil
 }
