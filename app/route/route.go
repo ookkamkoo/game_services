@@ -13,5 +13,5 @@ func SetRoute(app *fiber.App) {
 
 	api := app.Group("/api")
 	api.Post("/launch", controllers.LaunchProvider)
-	api.Post("/Products/:id", controllers.ProductsByCategory)
+	api.Post("/products/:id", controllers.ProductsByCategory)
 }
