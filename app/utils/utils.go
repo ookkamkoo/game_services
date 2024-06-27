@@ -1,11 +1,11 @@
 package utils
 
 import (
+	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
 	"encoding/base64"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
@@ -52,12 +52,24 @@ func SuccessResponse(c *fiber.Ctx, data interface{}, message string) error {
 	})
 }
 
+func pkcs7Pad(data []byte, blockSize int) []byte {
+	padding := blockSize - len(data)%blockSize
+	padtext := bytes.Repeat([]byte{byte(padding)}, padding)
+	return append(data, padtext...)
+}
+
+func pkcs7Unpad(data []byte, blockSize int) []byte {
+	length := len(data)
+	unpadding := int(data[length-1])
+	return data[:(length - unpadding)]
+}
+
 func Encrypt(text string, key string) (string, error) {
 	if len(key) != 32 {
 		return "", errors.New("key must be 32 bytes long")
 	}
 
-	iv := make([]byte, aes.BlockSize) // Initialization vector
+	iv := make([]byte, aes.BlockSize)
 	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
 		return "", err
 	}
@@ -67,16 +79,15 @@ func Encrypt(text string, key string) (string, error) {
 		return "", err
 	}
 
-	ciphertext := make([]byte, len(text))
-	stream := cipher.NewCFBEncrypter(block, iv)
-	stream.XORKeyStream(ciphertext, []byte(text))
+	paddedText := pkcs7Pad([]byte(text), block.BlockSize())
+	encrypted := make([]byte, len(paddedText))
+	mode := cipher.NewCBCEncrypter(block, iv)
+	mode.CryptBlocks(encrypted, paddedText)
 
-	// Combine IV and encrypted text
-	result := fmt.Sprintf("%s:%s", hex.EncodeToString(iv), hex.EncodeToString(ciphertext))
-	return base64.StdEncoding.EncodeToString([]byte(result)), nil
+	data := append(iv, encrypted...)
+	return base64.StdEncoding.EncodeToString(data), nil
 }
 
-// Decrypt decrypts the encrypted text using AES-256-CBC algorithm.
 func Decrypt(encryptedText string, key string) (string, error) {
 	if len(key) != 32 {
 		return "", errors.New("key must be 32 bytes long")
@@ -84,34 +95,25 @@ func Decrypt(encryptedText string, key string) (string, error) {
 
 	decoded, err := base64.StdEncoding.DecodeString(encryptedText)
 	if err != nil {
-		return "", err
+		return "", errors.New("invalid base64 string")
 	}
 
-	parts := string(decoded)
-	ivHex := parts[:32]
-	encrypted := parts[33:]
-
-	iv, err := hex.DecodeString(ivHex)
-	if err != nil {
-		return "", err
+	if len(decoded) <= aes.BlockSize {
+		return "", errors.New("encrypted text is too short")
 	}
 
-	if len(iv) != aes.BlockSize {
-		return "", errors.New("IV must be 16 bytes long")
-	}
+	iv := decoded[:aes.BlockSize]
+	encrypted := decoded[aes.BlockSize:]
 
 	block, err := aes.NewCipher([]byte(key))
 	if err != nil {
-		return "", err
+		return "", errors.New("failed to create new cipher")
 	}
 
-	ciphertext, err := hex.DecodeString(encrypted)
-	if err != nil {
-		return "", err
-	}
+	decrypted := make([]byte, len(encrypted))
+	mode := cipher.NewCBCDecrypter(block, iv)
+	mode.CryptBlocks(decrypted, encrypted)
 
-	stream := cipher.NewCFBDecrypter(block, iv)
-	stream.XORKeyStream(ciphertext, ciphertext)
-
-	return string(ciphertext), nil
+	decrypted = pkcs7Unpad(decrypted, block.BlockSize())
+	return string(decrypted), nil
 }
