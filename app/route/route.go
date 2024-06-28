@@ -28,5 +28,5 @@ func SetRoute(app *fiber.App) {
 	api.Get("/products/:categoryId", controllers.ProductsByCategory)
 	api.Get("/game-list/:categoryId/:productId", controllers.GameList)
 	api.Post("/launch-game", controllers.LaunchGame)
-	api.Get("/user-information/:username", controllers.UserInformation)
+	// api.Get("/user-information/:username", controllers.UserInformation)
 }

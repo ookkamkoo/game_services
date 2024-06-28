@@ -244,10 +244,10 @@ func LaunchGame(c *fiber.Ctx) error {
 	}
 
 	// Validate required fields
-	if launchReq.PlayerUsername == "" || launchReq.LaunchCode == "" || launchReq.AuthToken == "" {
+	if launchReq.PlayerUsername == "" || launchReq.LaunchCode == "" {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"status":  "error",
-			"message": "playerUsername, launchCode, and authToken are required",
+			"message": "playerUsername, launchCode  required",
 		})
 	}
 
