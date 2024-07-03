@@ -35,18 +35,18 @@ type BalanceCheckResponse struct {
 }
 
 type Transaction struct {
-	ID            string `json:"id"`
-	Status        string `json:"status"`
-	RoundID       string `json:"roundId"`
-	BetAmount     int    `json:"betAmount"`
-	PayoutAmount  int    `json:"payoutAmount"`
-	GameCode      string `json:"gameCode"`
-	PlayInfo      string `json:"playInfo"`
-	TxnID         string `json:"txnId"`
-	IsFreeSpin    bool   `json:"isFreeSpin"`
-	BuyFeature    bool   `json:"buyFeature"`
-	BonusFreeSpin bool   `json:"bonusFreeSpin"`
-	IsEndRound    bool   `json:"isEndRound"`
+	ID            string  `json:"id"`
+	Status        string  `json:"status"`
+	RoundID       string  `json:"roundId"`
+	BetAmount     float32 `json:"betAmount"`
+	PayoutAmount  float32 `json:"payoutAmount"`
+	GameCode      string  `json:"gameCode"`
+	PlayInfo      string  `json:"playInfo"`
+	TxnID         string  `json:"txnId"`
+	IsFreeSpin    bool    `json:"isFreeSpin"`
+	BuyFeature    bool    `json:"buyFeature"`
+	BonusFreeSpin bool    `json:"bonusFreeSpin"`
+	IsEndRound    bool    `json:"isEndRound"`
 }
 
 func CheckBalancePG(c *fiber.Ctx) error {
