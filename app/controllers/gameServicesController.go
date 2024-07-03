@@ -16,7 +16,7 @@ const key = "MNzLhy68lkH418xGYFE41XkKvoiRr2FX"
 
 // pg100
 
-const privateURLPG100 = "https://agent-api.pgf-asw0uz.com/"
+const privateURLPG100 = "https://agent-api.pgf-asw0uz.com"
 const apiKey = "OWJxTzlTNzdCRzpWWXVjZ200emhjcGFiTnZ3YzlTNWR3YWhXWk1HMmNpOQ=="
 
 type LaunchRequest struct {
