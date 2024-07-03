@@ -66,7 +66,7 @@ func PGLaunchGames(data BodyLoginPG) (any, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequest(http.MethodGet, url, bytes.NewBuffer(reqBody))
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(reqBody))
 	if err != nil {
 		return nil, err
 	}
