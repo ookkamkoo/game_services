@@ -22,16 +22,34 @@ type BodyLoginPG struct {
 }
 
 type BalanceCheckResponse struct {
-	ID              string `json:"id"`
-	StatusCode      int    `json:"statusCode"`
-	TimestampMillis int64  `json:"timestampMillis"`
-	ProductId       string `json:"productId"`
-	Currency        string `json:"currency"`
-	Balance         int    `json:"balance"`
-	Username        string `json:"username"`
+	ID              string        `json:"id"`
+	StatusCode      int           `json:"statusCode"`
+	TimestampMillis int64         `json:"timestampMillis"`
+	ProductId       string        `json:"productId"`
+	Currency        string        `json:"currency"`
+	Balance         float32       `json:"balance"`
+	Username        string        `json:"username"`
+	Transactions    []Transaction `json:"txns"`
+	BalanceBefore   float32       `json:"balanceBefore"`
+	BalanceAfter    float32       `json:"balanceAfter"`
 }
 
-func CheckBalance(c *fiber.Ctx) error {
+type Transaction struct {
+	ID            string `json:"id"`
+	Status        string `json:"status"`
+	RoundID       string `json:"roundId"`
+	BetAmount     int    `json:"betAmount"`
+	PayoutAmount  int    `json:"payoutAmount"`
+	GameCode      string `json:"gameCode"`
+	PlayInfo      string `json:"playInfo"`
+	TxnID         string `json:"txnId"`
+	IsFreeSpin    bool   `json:"isFreeSpin"`
+	BuyFeature    bool   `json:"buyFeature"`
+	BonusFreeSpin bool   `json:"bonusFreeSpin"`
+	IsEndRound    bool   `json:"isEndRound"`
+}
+
+func CheckBalancePG(c *fiber.Ctx) error {
 	var body BalanceCheckResponse
 	if err := c.BodyParser(&body); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -45,7 +63,27 @@ func CheckBalance(c *fiber.Ctx) error {
 	// find user
 	now := time.Now()
 	timestamp := now.UnixNano() / int64(time.Millisecond)
-	body.Balance = 1000
+	body.Balance = 10000
+	body.TimestampMillis = timestamp
+
+	return utils.SuccessResponse(c, body, "success")
+}
+
+func SettleBetsPG(c *fiber.Ctx) error {
+	var body BalanceCheckResponse
+	if err := c.BodyParser(&body); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"status":  "error",
+			"message": "Invalid request payload",
+			"error":   err.Error(),
+		})
+	}
+	// find user
+	//
+	// find user
+	now := time.Now()
+	timestamp := now.UnixNano() / int64(time.Millisecond)
+	body.Balance = 10000
 	body.TimestampMillis = timestamp
 
 	return utils.SuccessResponse(c, body, "success")
