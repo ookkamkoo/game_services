@@ -56,12 +56,19 @@ func PGGameList() (any, error) {
 
 func PGLaunchGames(data BodyLoginPG) (any, error) {
 	url := fmt.Sprintf("%s/seamless/api/v2/login", privateURLPG100)
+	fmt.Println({
+		"username":     data.Username,
+		"gameCode":     data.GameCode,
+		"sessionToken": data.SessionToken,
+		"language":     data.Language,
+	});
 	reqBody, err := json.Marshal(map[string]interface{}{
 		"username":     data.Username,
 		"gameCode":     data.GameCode,
 		"sessionToken": data.SessionToken,
 		"language":     data.Language,
 	})
+	
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +79,7 @@ func PGLaunchGames(data BodyLoginPG) (any, error) {
 	}
 
 	req.Header.Set("x-api-key", apiKey)
-
+	fmt.Println(apiKey)
 	client := http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
