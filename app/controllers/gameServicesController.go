@@ -369,7 +369,8 @@ func LaunchGames(c *fiber.Ctx) error {
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"status":  "error",
-				"message": err,
+				"message": "Error Launch Game",
+				"error":   err.Error(),
 			})
 		}
 
@@ -379,6 +380,7 @@ func LaunchGames(c *fiber.Ctx) error {
 			"message": "Response decoded successfully",
 			"data":    data,
 		})
+	} else {
+		return utils.SuccessResponse(c, "success", "success")
 	}
-	return utils.SuccessResponse(c, "success", "success")
 }
