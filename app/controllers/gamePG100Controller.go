@@ -56,19 +56,14 @@ func PGGameList() (any, error) {
 
 func PGLaunchGames(data BodyLoginPG) (any, error) {
 	url := fmt.Sprintf("%s/seamless/api/v2/login", privateURLPG100)
-	fmt.Println({
-		"username":     data.Username,
-		"gameCode":     data.GameCode,
-		"sessionToken": data.SessionToken,
-		"language":     data.Language,
-	});
+	fmt.Println(data)
 	reqBody, err := json.Marshal(map[string]interface{}{
 		"username":     data.Username,
 		"gameCode":     data.GameCode,
 		"sessionToken": data.SessionToken,
 		"language":     data.Language,
 	})
-	
+
 	if err != nil {
 		return nil, err
 	}
