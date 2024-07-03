@@ -14,11 +14,6 @@ const privateURL = "https://api-test.gpsuperapi.com/api"
 const operator_token = "445e6ffe-6d36-4fe9-93a7-f4ca25289058:be423e20-e1ba-4296-9044-3cfc6f7424cd"
 const key = "MNzLhy68lkH418xGYFE41XkKvoiRr2FX"
 
-// pg100
-
-const privateURLPG100 = "https://agent-api.pgf-asw0uz.com"
-const apiKey = "OWJxTzlTNzdCRzpWWXVjZ200emhjcGFiTnZ3YzlTNWR3YWhXWk1HMmNpOQ=="
-
 type LaunchRequest struct {
 	PlayerUsername string `json:"playerUsername"`
 	DeviceType     string `json:"deviceType"`
@@ -116,46 +111,12 @@ func GameList(c *fiber.Ctx) error {
 	}
 
 	if productId == "pg100" {
-		url := fmt.Sprintf("%s/seamless/api/v2/games", privateURLPG100)
-		fmt.Println(url)
-		req, err := http.NewRequest(http.MethodGet, url, nil)
+
+		data, err := PGGameList()
 		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"status":  "error",
-				"message": "Failed to create request",
-				"error":   err.Error(),
-			})
-		}
-		req.Header.Set("x-api-key", apiKey)
-		fmt.Println(req.Header)
-
-		client := http.Client{}
-		resp, err := client.Do(req)
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"status":  "error",
-				"message": "Failed to fetch game list",
-				"error":   err.Error(),
-			})
-		}
-		defer resp.Body.Close()
-
-		// Check the response status code
-		if resp.StatusCode != http.StatusOK {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"status":  "error",
-				"message": "Failed to fetch game list",
-				"error":   fmt.Sprintf("unexpected status code: %d", resp.StatusCode),
-			})
-		}
-
-		// Decode the response body into a JSON array
-		var responseMap map[string]interface{}
-		if err := json.NewDecoder(resp.Body).Decode(&responseMap); err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"status":  "error",
-				"message": "Failed to decode response",
-				"error":   err.Error(),
+				"message": err,
 			})
 		}
 
@@ -163,7 +124,7 @@ func GameList(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
 			"status":  "success",
 			"message": "Response decoded successfully",
-			"data":    responseMap,
+			"data":    data,
 		})
 
 	} else {
