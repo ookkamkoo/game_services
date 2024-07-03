@@ -13,6 +13,8 @@ import (
 
 const privateURLPG100 = "https://agent-api.pgf-asw0uz.com"
 const apiKey = "OWJxTzlTNzdCRzpWWXVjZ200emhjcGFiTnZ3YzlTNWR3YWhXWk1HMmNpOQ=="
+
+const apiKeyBankend = "BKw7jpQd8SOv7LuqPFq6MgQ4A1TflW4Ls"
 const urlBankend = "https://backend.scbbbb.com/game-services/"
 
 type BodyLoginPG struct {
@@ -131,7 +133,7 @@ func GetBalancePG(username string) (ResponseData, error) {
 	}
 
 	// Set the required headers
-	req.Header.Set("x-api-key", apiKey)
+	req.Header.Set("x-api-key", apiKeyBankend)
 	req.Header.Set("Content-Type", "application/json")
 
 	// Execute the HTTP request
