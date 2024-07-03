@@ -71,6 +71,7 @@ func CheckBalancePG(c *fiber.Ctx) error {
 			"error":   err.Error(),
 		})
 	}
+	fmt.Println("find user")
 	// find user
 	data, err := GetBalancePG(body.Username)
 
@@ -87,6 +88,46 @@ func CheckBalancePG(c *fiber.Ctx) error {
 	body.TimestampMillis = timestamp
 
 	return utils.SuccessResponse(c, body, "success")
+}
+
+func GetBalancePG(username string) (ResponseData, error) {
+	url := fmt.Sprintf("%s/getBalance", urlBankend)
+	reqBody, err := json.Marshal(map[string]interface{}{
+		"username": username,
+	})
+	fmt.Println(username)
+	if err != nil {
+		return ResponseData{}, fmt.Errorf("failed to marshal request body: %v", err)
+	}
+	fmt.Println("11111111")
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(reqBody))
+	if err != nil {
+		return ResponseData{}, fmt.Errorf("failed to create HTTP request: %v", err)
+	}
+	fmt.Println("222222222")
+	// Set the required headers
+	req.Header.Set("x-api-key", apiKeyBankend)
+	req.Header.Set("Content-Type", "application/json")
+
+	// Execute the HTTP request
+	client := http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return ResponseData{}, fmt.Errorf("failed to send HTTP request: %v", err)
+	}
+	defer resp.Body.Close()
+	fmt.Println("3333333333333")
+	// Check the response status code
+	if resp.StatusCode != http.StatusOK {
+		return ResponseData{}, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	}
+	fmt.Println("44444444444444")
+	// Decode the response body into a JSON map
+	var responseMap ResponseData
+	if err := json.NewDecoder(resp.Body).Decode(&responseMap); err != nil {
+		return ResponseData{}, fmt.Errorf("failed to decode response body: %v", err)
+	}
+	return responseMap, nil
 }
 
 func SettleBetsPG(c *fiber.Ctx) error {
@@ -115,46 +156,6 @@ func SettleBetsPG(c *fiber.Ctx) error {
 	body.TimestampMillis = timestamp
 
 	return utils.SuccessResponse(c, body, "success")
-}
-
-func GetBalancePG(username string) (ResponseData, error) {
-	url := fmt.Sprintf("%s/getBalance", urlBankend)
-	reqBody, err := json.Marshal(map[string]interface{}{
-		"username": username,
-	})
-
-	if err != nil {
-		return ResponseData{}, fmt.Errorf("failed to marshal request body: %v", err)
-	}
-
-	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(reqBody))
-	if err != nil {
-		return ResponseData{}, fmt.Errorf("failed to create HTTP request: %v", err)
-	}
-
-	// Set the required headers
-	req.Header.Set("x-api-key", apiKeyBankend)
-	req.Header.Set("Content-Type", "application/json")
-
-	// Execute the HTTP request
-	client := http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return ResponseData{}, fmt.Errorf("failed to send HTTP request: %v", err)
-	}
-	defer resp.Body.Close()
-
-	// Check the response status code
-	if resp.StatusCode != http.StatusOK {
-		return ResponseData{}, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
-	}
-
-	// Decode the response body into a JSON map
-	var responseMap ResponseData
-	if err := json.NewDecoder(resp.Body).Decode(&responseMap); err != nil {
-		return ResponseData{}, fmt.Errorf("failed to decode response body: %v", err)
-	}
-	return responseMap, nil
 }
 
 func PGGameList() (map[string]interface{}, error) {
