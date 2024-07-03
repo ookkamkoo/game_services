@@ -25,7 +25,7 @@ func GP100Provider(c *fiber.Ctx) error {
 	return utils.SuccessResponse(c, "success", "success")
 }
 
-func PGGameList() (any, error) {
+func PGGameList() (map[string]interface{}, error) {
 	url := fmt.Sprintf("%s/seamless/api/v2/games", privateURLPG100)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
@@ -76,7 +76,7 @@ func PGLaunchGames(data BodyLoginPG) (map[string]interface{}, error) {
 
 	// Set the required headers
 	req.Header.Set("x-api-key", apiKey)
-	req.Header.Set("Content-Type", "application/json")
+	// req.Header.Set("Content-Type", "application/json")
 
 	// Execute the HTTP request
 	client := http.Client{}
