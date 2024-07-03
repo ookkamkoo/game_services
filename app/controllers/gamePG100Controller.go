@@ -84,8 +84,9 @@ func PGLaunchGames(data BodyLoginPG) (any, error) {
 
 	// Check the response status code
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
-
+		// return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		fmt.Println(resp.StatusCode)
+		// fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
 	// Decode the response body into a JSON array
