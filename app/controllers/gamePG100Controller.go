@@ -15,7 +15,7 @@ const privateURLPG100 = "https://agent-api.pgf-asw0uz.com"
 const apiKey = "OWJxTzlTNzdCRzpWWXVjZ200emhjcGFiTnZ3YzlTNWR3YWhXWk1HMmNpOQ=="
 
 const apiKeyBankend = "BKw7jpQd8SOv7LuqPFq6MgQ4A1TflW4Ls"
-const urlBankend = "https://backend.scbbbb.com/game-services/"
+const urlBankend = "https://backend.scbbbb.com/game-services"
 
 type BodyLoginPG struct {
 	Username     string `json:"username"`
