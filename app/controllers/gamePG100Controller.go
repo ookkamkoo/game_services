@@ -76,7 +76,7 @@ func PGLaunchGames(data BodyLoginPG) (map[string]interface{}, error) {
 
 	// Set the required headers
 	req.Header.Set("x-api-key", apiKey)
-	// req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Content-Type", "application/json")
 
 	// Execute the HTTP request
 	client := http.Client{}
