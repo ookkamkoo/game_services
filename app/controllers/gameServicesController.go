@@ -11,9 +11,13 @@ import (
 )
 
 const privateURL = "https://api-test.gpsuperapi.com/api"
-
 const operator_token = "445e6ffe-6d36-4fe9-93a7-f4ca25289058:be423e20-e1ba-4296-9044-3cfc6f7424cd"
 const key = "MNzLhy68lkH418xGYFE41XkKvoiRr2FX"
+
+// pg100
+
+const privateURLPG100 = "https://agent-api.pgf-asw0uz.com/"
+const apiKey = "OWJxTzlTNzdCRzpWWXVjZ200emhjcGFiTnZ3YzlTNWR3YWhXWk1HMmNpOQ=="
 
 type LaunchRequest struct {
 	PlayerUsername string `json:"playerUsername"`
@@ -103,6 +107,7 @@ func GameList(c *fiber.Ctx) error {
 			"message": "categoryId is required",
 		})
 	}
+
 	if productId == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":  "error",
@@ -110,60 +115,111 @@ func GameList(c *fiber.Ctx) error {
 		})
 	}
 
-	url := fmt.Sprintf("%s/v1/games?categoryId=%s&productId=%s&page=1&limit=100", privateURL, categoryId, productId)
+	if productId == "pg100" {
+		url := fmt.Sprintf("%s/seamless/api/v2/games", privateURLPG100)
+		req, err := http.NewRequest(http.MethodGet, url, nil)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"status":  "error",
+				"message": "Failed to create request",
+				"error":   err.Error(),
+			})
+		}
+		req.Header.Set("x-api-key", apiKey)
 
-	// Create a new GET request
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"status":  "error",
-			"message": "Failed to create request",
-			"error":   err.Error(),
+		client := http.Client{}
+		resp, err := client.Do(req)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"status":  "error",
+				"message": "Failed to fetch game list",
+				"error":   err.Error(),
+			})
+		}
+		defer resp.Body.Close()
+
+		// Check the response status code
+		if resp.StatusCode != http.StatusOK {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"status":  "error",
+				"message": "Failed to fetch game list",
+				"error":   fmt.Sprintf("unexpected status code: %d", resp.StatusCode),
+			})
+		}
+
+		// Decode the response body into a JSON array
+		var responseMap map[string]interface{}
+		if err := json.NewDecoder(resp.Body).Decode(&responseMap); err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"status":  "error",
+				"message": "Failed to decode response",
+				"error":   err.Error(),
+			})
+		}
+
+		// Return the response map
+		return c.JSON(fiber.Map{
+			"status":  "success",
+			"message": "Response decoded successfully",
+			"data":    responseMap,
+		})
+
+	} else {
+		url := fmt.Sprintf("%s/v1/games?categoryId=%s&productId=%s&page=1&limit=100", privateURL, categoryId, productId)
+
+		// Create a new GET request
+		req, err := http.NewRequest(http.MethodGet, url, nil)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"status":  "error",
+				"message": "Failed to create request",
+				"error":   err.Error(),
+			})
+		}
+
+		encrypted, err := utils.Encrypt(operator_token, key)
+		if err != nil {
+			fmt.Println("Encryption error:", err)
+			return err
+		}
+		req.Header.Set("X-Authorization-Token", encrypted)
+		client := http.Client{}
+		resp, err := client.Do(req)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"status":  "error",
+				"message": "Failed to fetch game list",
+				"error":   err.Error(),
+			})
+		}
+		defer resp.Body.Close()
+
+		// Check the response status code
+		if resp.StatusCode != http.StatusOK {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"status":  "error",
+				"message": "Failed to fetch game list",
+				"error":   fmt.Sprintf("unexpected status code: %d", resp.StatusCode),
+			})
+		}
+
+		// Decode the response body into a JSON array
+		var responseMap map[string]interface{}
+		if err := json.NewDecoder(resp.Body).Decode(&responseMap); err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"status":  "error",
+				"message": "Failed to decode response",
+				"error":   err.Error(),
+			})
+		}
+
+		// Return the response map
+		return c.JSON(fiber.Map{
+			"status":  "success",
+			"message": "Response decoded successfully",
+			"data":    responseMap,
 		})
 	}
-
-	encrypted, err := utils.Encrypt(operator_token, key)
-	if err != nil {
-		fmt.Println("Encryption error:", err)
-		return err
-	}
-	req.Header.Set("X-Authorization-Token", encrypted)
-	client := http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"status":  "error",
-			"message": "Failed to fetch game list",
-			"error":   err.Error(),
-		})
-	}
-	defer resp.Body.Close()
-
-	// Check the response status code
-	if resp.StatusCode != http.StatusOK {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"status":  "error",
-			"message": "Failed to fetch game list",
-			"error":   fmt.Sprintf("unexpected status code: %d", resp.StatusCode),
-		})
-	}
-
-	// Decode the response body into a JSON array
-	var responseMap map[string]interface{}
-	if err := json.NewDecoder(resp.Body).Decode(&responseMap); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"status":  "error",
-			"message": "Failed to decode response",
-			"error":   err.Error(),
-		})
-	}
-
-	// Return the response map
-	return c.JSON(fiber.Map{
-		"status":  "success",
-		"message": "Response decoded successfully",
-		"data":    responseMap,
-	})
 }
 
 func UserInformation(c *fiber.Ctx) error {
@@ -325,4 +381,9 @@ func LaunchGame(c *fiber.Ctx) error {
 		"message": "Response decoded successfully",
 		"data":    responseMap,
 	})
+}
+
+func LaunchGames(c *fiber.Ctx) error {
+
+	return utils.SuccessResponse(c, "success", "success")
 }
