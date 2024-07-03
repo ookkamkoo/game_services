@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"game_services/app/utils"
 	"net/http"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -20,9 +21,34 @@ type BodyLoginPG struct {
 	Language     string `json:"language"`
 }
 
-func GP100Provider(c *fiber.Ctx) error {
-	// Return the roles
-	return utils.SuccessResponse(c, "success", "success")
+type BalanceCheckResponse struct {
+	ID              string `json:"id"`
+	StatusCode      int    `json:"statusCode"`
+	TimestampMillis int64  `json:"timestampMillis"`
+	ProductId       string `json:"productId"`
+	Currency        string `json:"currency"`
+	Balance         int    `json:"balance"`
+	Username        string `json:"username"`
+}
+
+func CheckBalance(c *fiber.Ctx) error {
+	var body BalanceCheckResponse
+	if err := c.BodyParser(&body); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"status":  "error",
+			"message": "Invalid request payload",
+			"error":   err.Error(),
+		})
+	}
+	// find user
+	//
+	// find user
+	now := time.Now()
+	timestamp := now.UnixNano() / int64(time.Millisecond)
+	body.Balance = 1000
+	body.TimestampMillis = timestamp
+
+	return utils.SuccessResponse(c, body, "success")
 }
 
 func PGGameList() (map[string]interface{}, error) {
