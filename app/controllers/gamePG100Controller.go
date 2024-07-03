@@ -13,6 +13,7 @@ import (
 
 const privateURLPG100 = "https://agent-api.pgf-asw0uz.com"
 const apiKey = "OWJxTzlTNzdCRzpWWXVjZ200emhjcGFiTnZ3YzlTNWR3YWhXWk1HMmNpOQ=="
+const urlBankend = "https://backend.scbbbb.com/game-services/"
 
 type BodyLoginPG struct {
 	Username     string `json:"username"`
@@ -49,6 +50,16 @@ type Transaction struct {
 	IsEndRound    bool    `json:"isEndRound"`
 }
 
+type ResponseData struct {
+	Data struct {
+		Balance  float32 `json:"balance"`
+		Username string  `json:"username"`
+	} `json:"data"`
+	Message string `json:"message"`
+	Status  string `json:"status"`
+	Time    string `json:"time"`
+}
+
 func CheckBalancePG(c *fiber.Ctx) error {
 	var body BalanceCheckResponse
 	if err := c.BodyParser(&body); err != nil {
@@ -59,11 +70,18 @@ func CheckBalancePG(c *fiber.Ctx) error {
 		})
 	}
 	// find user
-	//
+	data, err := GetBalancePG(body.Username)
+
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  "error",
+			"message": err,
+		})
+	}
 	// find user
 	now := time.Now()
 	timestamp := now.UnixNano() / int64(time.Millisecond)
-	body.Balance = 10000
+	body.Balance = data.Data.Balance
 	body.TimestampMillis = timestamp
 
 	return utils.SuccessResponse(c, body, "success")
@@ -79,14 +97,62 @@ func SettleBetsPG(c *fiber.Ctx) error {
 		})
 	}
 	// find user
-	//
+	data, err := GetBalancePG(body.Username)
+
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  "error",
+			"message": err,
+		})
+	}
+
 	// find user
 	now := time.Now()
 	timestamp := now.UnixNano() / int64(time.Millisecond)
-	body.Balance = 10000
+	body.Balance = data.Data.Balance
 	body.TimestampMillis = timestamp
 
 	return utils.SuccessResponse(c, body, "success")
+}
+
+func GetBalancePG(username string) (ResponseData, error) {
+	url := fmt.Sprintf("%s/getBalance", urlBankend)
+	reqBody, err := json.Marshal(map[string]interface{}{
+		"username": username,
+	})
+
+	if err != nil {
+		return ResponseData{}, fmt.Errorf("failed to marshal request body: %v", err)
+	}
+
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(reqBody))
+	if err != nil {
+		return ResponseData{}, fmt.Errorf("failed to create HTTP request: %v", err)
+	}
+
+	// Set the required headers
+	req.Header.Set("x-api-key", apiKey)
+	req.Header.Set("Content-Type", "application/json")
+
+	// Execute the HTTP request
+	client := http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return ResponseData{}, fmt.Errorf("failed to send HTTP request: %v", err)
+	}
+	defer resp.Body.Close()
+
+	// Check the response status code
+	if resp.StatusCode != http.StatusOK {
+		return ResponseData{}, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	}
+
+	// Decode the response body into a JSON map
+	var responseMap ResponseData
+	if err := json.NewDecoder(resp.Body).Decode(&responseMap); err != nil {
+		return ResponseData{}, fmt.Errorf("failed to decode response body: %v", err)
+	}
+	return responseMap, nil
 }
 
 func PGGameList() (map[string]interface{}, error) {
