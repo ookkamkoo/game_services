@@ -347,6 +347,38 @@ func LaunchGame(c *fiber.Ctx) error {
 }
 
 func LaunchGames(c *fiber.Ctx) error {
+	productId := c.Params("productId")
+	if productId == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  "error",
+			"message": "productId is required",
+		})
+	}
 
+	var body BodyLoginPG
+	if err := c.BodyParser(&body); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"status":  "error",
+			"message": "Invalid request payload",
+			"error":   err.Error(),
+		})
+	}
+
+	if productId == "pg100" {
+		data, err := PGLaunchGames(body)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"status":  "error",
+				"message": err,
+			})
+		}
+
+		// Return the response map
+		return c.JSON(fiber.Map{
+			"status":  "success",
+			"message": "Response decoded successfully",
+			"data":    data,
+		})
+	}
 	return utils.SuccessResponse(c, "success", "success")
 }

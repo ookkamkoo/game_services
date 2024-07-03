@@ -27,9 +27,9 @@ func SetRoute(app *fiber.App) {
 
 	// Define routes for general APIs
 	api := app.Group("/api")
-	api.Get("/products/:categoryId", controllers.ProductsByCategory)
+	// api.Get("/products/:categoryId", controllers.ProductsByCategory)
 	api.Get("/game-list/:categoryId/:productId", controllers.GameList)
-	api.Post("/launch-game", controllers.LaunchGame)
-	api.Post("/launch-games", controllers.LaunchGames)
+	// api.Post("/launch-game", controllers.LaunchGame)
+	api.Post("/launch-games/:productId", controllers.LaunchGames)
 	// api.Get("/user-information/:username", controllers.UserInformation)
 }
