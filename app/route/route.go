@@ -23,7 +23,7 @@ func SetRoute(app *fiber.App) {
 	gameProvider.Post("/balance", controllers.GameProvider)
 	// Example: gameProvider.Get("/aa", controllers.GameProviderAA)
 	gamePG := app.Group("/game-pg-provider/")
-	gamePG.Get("/checkBalance", controllers.CheckBalance)
+	gamePG.Post("/checkBalance", controllers.CheckBalance)
 
 	// Define routes for general APIs
 	api := app.Group("/api")
