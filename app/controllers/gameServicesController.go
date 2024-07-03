@@ -117,6 +117,7 @@ func GameList(c *fiber.Ctx) error {
 
 	if productId == "pg100" {
 		url := fmt.Sprintf("%s/seamless/api/v2/games", privateURLPG100)
+		fmt.Println(url)
 		req, err := http.NewRequest(http.MethodGet, url, nil)
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -126,6 +127,7 @@ func GameList(c *fiber.Ctx) error {
 			})
 		}
 		req.Header.Set("x-api-key", apiKey)
+		fmt.Println(req.Header)
 
 		client := http.Client{}
 		resp, err := client.Do(req)
