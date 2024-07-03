@@ -54,45 +54,47 @@ func PGGameList() (any, error) {
 	return responseMap, nil
 }
 
-func PGLaunchGames(data BodyLoginPG) (any, error) {
+func PGLaunchGames(data BodyLoginPG) (map[string]interface{}, error) {
 	url := fmt.Sprintf("%s/seamless/api/v2/login", privateURLPG100)
-	fmt.Println(data)
+
+	// Marshal the data to JSON
 	reqBody, err := json.Marshal(map[string]interface{}{
 		"username":     data.Username,
 		"gameCode":     data.GameCode,
 		"sessionToken": data.SessionToken,
 		"language":     data.Language,
 	})
-
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to marshal request body: %v", err)
 	}
 
+	// Create a new HTTP POST request
 	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(reqBody))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create HTTP request: %v", err)
 	}
 
+	// Set the required headers
 	req.Header.Set("x-api-key", apiKey)
-	fmt.Println(apiKey)
+	req.Header.Set("Content-Type", "application/json")
+
+	// Execute the HTTP request
 	client := http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to send HTTP request: %v", err)
 	}
 	defer resp.Body.Close()
 
 	// Check the response status code
 	if resp.StatusCode != http.StatusOK {
-		// return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
-		fmt.Println(resp.StatusCode)
-		// fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
-	// Decode the response body into a JSON array
+	// Decode the response body into a JSON map
 	var responseMap map[string]interface{}
 	if err := json.NewDecoder(resp.Body).Decode(&responseMap); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to decode response body: %v", err)
 	}
 
 	return responseMap, nil
