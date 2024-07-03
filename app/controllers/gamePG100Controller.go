@@ -127,6 +127,7 @@ func GetBalancePG(username string) (ResponseData, error) {
 	if err := json.NewDecoder(resp.Body).Decode(&responseMap); err != nil {
 		return ResponseData{}, fmt.Errorf("failed to decode response body: %v", err)
 	}
+	fmt.Println(responseMap)
 	return responseMap, nil
 }
 
