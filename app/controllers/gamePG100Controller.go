@@ -196,6 +196,7 @@ func PGGameList() (map[string]interface{}, error) {
 func PGLaunchGames(data BodyLoginPG) (map[string]interface{}, error) {
 	url := fmt.Sprintf("%s/seamless/api/v2/login", privateURLPG100)
 
+	fmt.Println(data.Username)
 	// Marshal the data to JSON
 	reqBody, err := json.Marshal(map[string]interface{}{
 		"username":     data.Username,
