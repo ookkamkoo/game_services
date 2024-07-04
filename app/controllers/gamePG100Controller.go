@@ -80,6 +80,7 @@ func CheckBalancePG(c *fiber.Ctx) error {
 		})
 	}
 	fmt.Println("find user")
+	fmt.Println(body)
 	// find user
 	data, err := getBalanceServerPG(body.Username)
 
