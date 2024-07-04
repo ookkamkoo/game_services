@@ -204,10 +204,10 @@ func PGLaunchGames(data BodyLoginPG) (map[string]interface{}, error) {
 	fmt.Println(data.Username)
 	// Marshal the data to JSON
 	reqBody, err := json.Marshal(map[string]interface{}{
-		"username": data.Username,
-		"gameCode": data.GameCode,
-		// "sessionToken": data.SessionToken,
-		"language": data.Language,
+		"username":     data.Username,
+		"gameCode":     data.GameCode,
+		"sessionToken": data.SessionToken,
+		"language":     data.Language,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal request body: %v", err)
