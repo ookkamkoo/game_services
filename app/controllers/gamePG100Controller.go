@@ -74,20 +74,20 @@ type ResponseData struct {
 func CheckBalancePG(c *fiber.Ctx) error {
 	var body BalanceCheckResponse
 	if err := c.BodyParser(&body); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"status":  "error",
-			"message": "Invalid request payload",
-			"error":   err.Error(),
+		fmt.Println(err)
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid request body",
 		})
 	}
 	fmt.Println("find user")
 	// find user
-	data, err := GetBalancePG(body.Username)
+	data, err := getBalanceServerPG(body.Username)
 
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"status":  "error",
-			"message": err,
+		fmt.Println(err)
+		fmt.Println("Error retrieving balance:", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to retrieve balance",
 		})
 	}
 	// find user
@@ -96,10 +96,10 @@ func CheckBalancePG(c *fiber.Ctx) error {
 	body.Balance = data.Data.Balance
 	body.TimestampMillis = timestamp
 
-	return utils.SuccessResponse(c, body, "success")
+	return c.JSON(body)
 }
 
-func GetBalancePG(username string) (ResponseData, error) {
+func getBalanceServerPG(username string) (ResponseData, error) {
 	url := fmt.Sprintf("%s/getBalance", urlBankend)
 	reqBody, err := json.Marshal(map[string]interface{}{
 		"username": username,
@@ -137,7 +137,7 @@ func GetBalancePG(username string) (ResponseData, error) {
 }
 
 func SettleBetsPG(c *fiber.Ctx) error {
-	var body BalanceCheckResponse
+	var body SettleCheckResponse
 	if err := c.BodyParser(&body); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"status":  "error",
@@ -146,23 +146,27 @@ func SettleBetsPG(c *fiber.Ctx) error {
 		})
 	}
 	// find user
-	data, err := GetBalancePG(body.Username)
+	// data, err := settleServer(body)
 
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"status":  "error",
-			"message": err,
-		})
-	}
+	// if err != nil {
+	// 	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+	// 		"status":  "error",
+	// 		"message": err,
+	// 	})
+	// }
 
 	// find user
-	now := time.Now()
-	timestamp := now.UnixNano() / int64(time.Millisecond)
-	body.Balance = data.Data.Balance
-	body.TimestampMillis = timestamp
+	// now := time.Now()
+	// timestamp := now.UnixNano() / int64(time.Millisecond)
+	// body.Balance = data.Data.Balance
+	// body.TimestampMillis = timestamp
 
 	return utils.SuccessResponse(c, body, "success")
 }
+
+// func settleServer(data SettleCheckResponse) error {
+// 	return utils.SuccessResponse(c, "success", "success")
+// }
 
 func PGGameList() (map[string]interface{}, error) {
 	url := fmt.Sprintf("%s/seamless/api/v2/games", privateURLPG100)
