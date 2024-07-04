@@ -25,16 +25,25 @@ type BodyLoginPG struct {
 }
 
 type BalanceCheckResponse struct {
+	ID              string  `json:"id"`
+	StatusCode      int     `json:"statusCode"`
+	TimestampMillis int64   `json:"timestampMillis"`
+	ProductId       string  `json:"productId"`
+	Currency        string  `json:"currency"`
+	Balance         float32 `json:"balance"`
+	Username        string  `json:"username"`
+}
+
+type SettleCheckResponse struct {
 	ID              string        `json:"id"`
 	StatusCode      int           `json:"statusCode"`
 	TimestampMillis int64         `json:"timestampMillis"`
 	ProductId       string        `json:"productId"`
 	Currency        string        `json:"currency"`
-	Balance         float32       `json:"balance"`
-	Username        string        `json:"username"`
-	Transactions    []Transaction `json:"txns"`
 	BalanceBefore   float32       `json:"balanceBefore"`
 	BalanceAfter    float32       `json:"balanceAfter"`
+	Username        string        `json:"username"`
+	Transactions    []Transaction `json:"txns"`
 }
 
 type Transaction struct {
@@ -99,12 +108,10 @@ func GetBalancePG(username string) (ResponseData, error) {
 	if err != nil {
 		return ResponseData{}, fmt.Errorf("failed to marshal request body: %v", err)
 	}
-	fmt.Println("11111111")
 	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(reqBody))
 	if err != nil {
 		return ResponseData{}, fmt.Errorf("failed to create HTTP request: %v", err)
 	}
-	fmt.Println("222222222")
 	// Set the required headers
 	req.Header.Set("x-api-key", apiKeyBankend)
 	req.Header.Set("Content-Type", "application/json")
@@ -116,12 +123,10 @@ func GetBalancePG(username string) (ResponseData, error) {
 		return ResponseData{}, fmt.Errorf("failed to send HTTP request: %v", err)
 	}
 	defer resp.Body.Close()
-	fmt.Println("3333333333333")
 	// Check the response status code
 	if resp.StatusCode != http.StatusOK {
 		return ResponseData{}, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
-	fmt.Println("44444444444444")
 	// Decode the response body into a JSON map
 	var responseMap ResponseData
 	if err := json.NewDecoder(resp.Body).Decode(&responseMap); err != nil {
