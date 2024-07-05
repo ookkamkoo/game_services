@@ -146,16 +146,17 @@ func SettleBetsPG(c *fiber.Ctx) error {
 			"error":   err.Error(),
 		})
 	}
+	fmt.Println("111111111111111111111")
 	// find user
-	// data, err := settleServer(body)
+	data, err := settleServer(body)
 
-	// if err != nil {
-	// 	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-	// 		"status":  "error",
-	// 		"message": err,
-	// 	})
-	// }
-
+	if err != nil {
+		fmt.Println("Error retrieving balance:", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to retrieve balance",
+		})
+	}
+	fmt.Println(data)
 	// find user
 	// now := time.Now()
 	// timestamp := now.UnixNano() / int64(time.Millisecond)
@@ -165,9 +166,42 @@ func SettleBetsPG(c *fiber.Ctx) error {
 	return utils.SuccessResponse(c, body, "success")
 }
 
-// func settleServer(data SettleCheckResponse) error {
-// 	return utils.SuccessResponse(c, "success", "success")
-// }
+func settleServer(data SettleCheckResponse) (SettleCheckResponse, error) {
+	// url := fmt.Sprintf("%s/settleGame", urlBankend)
+	// reqBody, err := json.Marshal(map[string]interface{}{
+	// 	"data": data,
+	// })
+	fmt.Println(data)
+	// if err != nil {
+	// 	return SettleCheckResponse{}, fmt.Errorf("failed to marshal request body: %v", err)
+	// }
+	// req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(reqBody))
+	// if err != nil {
+	// 	return SettleCheckResponse{}, fmt.Errorf("failed to create HTTP request: %v", err)
+	// }
+	// // Set the required headers
+	// req.Header.Set("x-api-key", apiKeyBankend)
+	// req.Header.Set("Content-Type", "application/json")
+
+	// // Execute the HTTP request
+	// client := http.Client{}
+	// resp, err := client.Do(req)
+	// if err != nil {
+	// 	return SettleCheckResponse{}, fmt.Errorf("failed to send HTTP request: %v", err)
+	// }
+	// defer resp.Body.Close()
+	// // Check the response status code
+	// if resp.StatusCode != http.StatusOK {
+	// 	return SettleCheckResponse{}, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	// }
+	// // Decode the response body into a JSON map
+	// var responseMap SettleCheckResponse
+	// if err := json.NewDecoder(resp.Body).Decode(&responseMap); err != nil {
+	// 	return SettleCheckResponse{}, fmt.Errorf("failed to decode response body: %v", err)
+	// }
+	// fmt.Println(responseMap)
+	return SettleCheckResponse{}, nil
+}
 
 func PGGameList() (map[string]interface{}, error) {
 	url := fmt.Sprintf("%s/seamless/api/v2/games", privateURLPG100)

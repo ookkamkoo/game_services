@@ -3,6 +3,7 @@ package route
 import (
 	"fmt"
 	"game_services/app/controllers"
+	"game_services/app/migration"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -18,6 +19,7 @@ func SetRoute(app *fiber.App) {
 	// Apply the logMiddleware to log all incoming requests
 	app.Use(logMiddleware)
 
+	app.Get("/migration", migrateHandler)
 	// Define routes for game provider APIs
 	gameProvider := app.Group("/game-provider/api")
 	gameProvider.Post("/balance", controllers.GameProvider)
@@ -33,4 +35,12 @@ func SetRoute(app *fiber.App) {
 	// api.Post("/launch-game", controllers.LaunchGame)
 	api.Post("/launch-games/:productId", controllers.LaunchGames)
 	// api.Get("/user-information/:username", controllers.UserInformation)
+}
+
+func migrateHandler(c *fiber.Ctx) error {
+	// Run migrations
+	migration.RunMigration()
+
+	// Return a success response
+	return c.SendString("Migrations completed successfully")
 }
