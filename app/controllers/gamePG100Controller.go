@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"game_services/app/utils"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -239,11 +240,12 @@ func PGLaunchGames(data BodyLoginPG) (map[string]interface{}, error) {
 	// Marshal the data to JSON
 	now := time.Now()
 	sec := now.Unix()
-	fmt.Println(sec)
+	secStr := strconv.FormatInt(sec, 10)
+	fmt.Println(secStr)
 	reqBody, err := json.Marshal(map[string]interface{}{
 		"username":     data.Username,
 		"gameCode":     data.GameCode,
-		"sessionToken": sec,
+		"sessionToken": secStr,
 		"language":     data.Language,
 	})
 	if err != nil {
