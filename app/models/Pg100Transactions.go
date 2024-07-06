@@ -30,8 +30,8 @@ type SettleCheckResponseFormBackend struct {
 	AgentID       uint    `json:"agent_id"`
 	Username      string  `json:"username"`
 	UsernameAgent string  `json:"username_agent"`
-	BalanceBefore float32 `json:"balanceBefore"`
-	BalanceAfter  float32 `json:"balanceAfter"`
+	BalanceBefore float32 `json:"amount_before"`
+	BalanceAfter  float32 `json:"amount_after"`
 }
 
 type Transaction struct {

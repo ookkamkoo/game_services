@@ -111,7 +111,7 @@ func SettleBetsPG(c *fiber.Ctx) error {
 			"error": "Failed to retrieve balance",
 		})
 	}
-	fmt.Println("data = ?", data)
+	fmt.Println("data = ", data)
 	// err = database.DB.Transaction(func(tx *gorm.DB) error {
 	// 	var pg100 models.Pg100Transactions
 	// 	pg100.UserID = data.Data.UserID
@@ -236,7 +236,7 @@ func settleServer(data models.SettleCheckResponse) (models.ResponseDataSettle, e
 	if err := json.NewDecoder(resp.Body).Decode(&responseMap); err != nil {
 		return models.ResponseDataSettle{}, fmt.Errorf("failed to decode response body: %v", err)
 	}
-	fmt.Println(responseMap)
+	// fmt.Println(responseMap)
 	return responseMap, nil
 }
 
