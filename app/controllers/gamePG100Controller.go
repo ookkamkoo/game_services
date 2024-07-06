@@ -201,7 +201,7 @@ func SettleBetsPG(c *fiber.Ctx) error {
 	resq.BalanceBefore = data.Data.BalanceBefore
 	resq.BalanceAfter = data.Data.BalanceAfter
 	resq.StatusCode = statusInt
-
+	fmt.Println("resq = ", resq)
 	return c.JSON(resq)
 }
 
