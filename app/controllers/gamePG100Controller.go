@@ -36,15 +36,15 @@ type BalanceCheckResponse struct {
 }
 
 type SettleCheckResponse struct {
-	ID              string        `json:"id"`
-	StatusCode      int           `json:"statusCode"`
-	TimestampMillis int64         `json:"timestampMillis"`
-	ProductId       string        `json:"productId"`
-	Currency        string        `json:"currency"`
-	BalanceBefore   float32       `json:"balanceBefore"`
-	BalanceAfter    float32       `json:"balanceAfter"`
-	Username        string        `json:"username"`
-	Transactions    []Transaction `json:"txns"`
+	ID              string      `json:"id"`
+	StatusCode      int         `json:"statusCode"`
+	TimestampMillis int64       `json:"timestampMillis"`
+	ProductId       string      `json:"productId"`
+	Currency        string      `json:"currency"`
+	BalanceBefore   float32     `json:"balanceBefore"`
+	BalanceAfter    float32     `json:"balanceAfter"`
+	Username        string      `json:"username"`
+	Transactions    Transaction `json:"txns"`
 }
 
 type Transaction struct {
@@ -147,6 +147,7 @@ func SettleBetsPG(c *fiber.Ctx) error {
 			"error":   err.Error(),
 		})
 	}
+
 	fmt.Println("111111111111111111111")
 	// find user
 	data, err := settleServer(body)
@@ -168,39 +169,39 @@ func SettleBetsPG(c *fiber.Ctx) error {
 }
 
 func settleServer(data SettleCheckResponse) (SettleCheckResponse, error) {
-	// url := fmt.Sprintf("%s/settleGame", urlBankend)
-	// reqBody, err := json.Marshal(map[string]interface{}{
-	// 	"data": data,
-	// })
-	fmt.Println(data)
-	// if err != nil {
-	// 	return SettleCheckResponse{}, fmt.Errorf("failed to marshal request body: %v", err)
-	// }
-	// req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(reqBody))
-	// if err != nil {
-	// 	return SettleCheckResponse{}, fmt.Errorf("failed to create HTTP request: %v", err)
-	// }
-	// // Set the required headers
-	// req.Header.Set("x-api-key", apiKeyBankend)
-	// req.Header.Set("Content-Type", "application/json")
+	url := fmt.Sprintf("%s/settleGame", urlBankend)
+	reqBody, err := json.Marshal(map[string]interface{}{
+		"username":  data.Username,
+		"betsettle": data.Transactions.PayoutAmount - data.Transactions.BetAmount,
+	})
+	if err != nil {
+		return SettleCheckResponse{}, fmt.Errorf("failed to marshal request body: %v", err)
+	}
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(reqBody))
+	if err != nil {
+		return SettleCheckResponse{}, fmt.Errorf("failed to create HTTP request: %v", err)
+	}
+	// Set the required headers
+	req.Header.Set("x-api-key", apiKeyBankend)
+	req.Header.Set("Content-Type", "application/json")
 
-	// // Execute the HTTP request
-	// client := http.Client{}
-	// resp, err := client.Do(req)
-	// if err != nil {
-	// 	return SettleCheckResponse{}, fmt.Errorf("failed to send HTTP request: %v", err)
-	// }
-	// defer resp.Body.Close()
-	// // Check the response status code
-	// if resp.StatusCode != http.StatusOK {
-	// 	return SettleCheckResponse{}, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
-	// }
-	// // Decode the response body into a JSON map
-	// var responseMap SettleCheckResponse
-	// if err := json.NewDecoder(resp.Body).Decode(&responseMap); err != nil {
-	// 	return SettleCheckResponse{}, fmt.Errorf("failed to decode response body: %v", err)
-	// }
-	// fmt.Println(responseMap)
+	// Execute the HTTP request
+	client := http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return SettleCheckResponse{}, fmt.Errorf("failed to send HTTP request: %v", err)
+	}
+	defer resp.Body.Close()
+	// Check the response status code
+	if resp.StatusCode != http.StatusOK {
+		return SettleCheckResponse{}, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	}
+	// Decode the response body into a JSON map
+	var responseMap SettleCheckResponse
+	if err := json.NewDecoder(resp.Body).Decode(&responseMap); err != nil {
+		return SettleCheckResponse{}, fmt.Errorf("failed to decode response body: %v", err)
+	}
+	fmt.Println(responseMap)
 	return SettleCheckResponse{}, nil
 }
 
