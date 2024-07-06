@@ -114,6 +114,7 @@ func SettleBetsPG(c *fiber.Ctx) error {
 			"error": "Failed to retrieve balance",
 		})
 	}
+	fmt.Println("data = ")
 	fmt.Println(data)
 	err = database.DB.Transaction(func(tx *gorm.DB) error {
 		var pg100 models.Pg100Transactions
@@ -193,6 +194,7 @@ func SettleBetsPG(c *fiber.Ctx) error {
 		return c.JSON(resq)
 	}
 
+	fmt.Println(data.Data.Status)
 	statusInt, err := strconv.Atoi(data.Data.Status)
 	if err != nil {
 		log.Fatalf("Failed to convert status to int: %v", err)
