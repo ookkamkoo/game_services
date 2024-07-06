@@ -25,6 +25,7 @@ type SettleCheckResponse struct {
 }
 
 type SettleCheckResponseFormBackend struct {
+	Status        string  `json:"status"`
 	UserID        uint    `json:"user_id"`
 	AgentID       uint    `json:"agent_id"`
 	Username      string  `json:"username"`
@@ -56,6 +57,13 @@ type ResponseData struct {
 	Message string `json:"message"`
 	Status  string `json:"status"`
 	Time    string `json:"time"`
+}
+
+type ResponseDataSettle struct {
+	Data    SettleCheckResponseFormBackend `json:"data"`
+	Message string                         `json:"message"`
+	Status  string                         `json:"status"`
+	Time    string                         `json:"time"`
 }
 
 type Pg100Transactions struct {

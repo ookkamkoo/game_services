@@ -4,9 +4,9 @@ import "time"
 
 type Reports struct {
 	ID                 uint      `json:"id" gorm:"primarykey;type:int2"`
-	UserID             string    `json:"user_id" gorm:"type:varchar(50);unique_index;not null"`
+	UserID             uint      `json:"user_id" gorm:"primarykey;type:int2;unique_index;not null"`
+	AgentID            uint      `json:"agent_id" gorm:"primarykey;type:int2;unique_index;not null"`
 	Username           string    `json:"username" gorm:"type:varchar(50);unique_index;not null"`
-	AgentID            string    `json:"agent_id" gorm:"type:varchar(50);unique_index;not null"`
 	RoundId            string    `json:"round_id" gorm:"type:varchar(50);not null"`
 	ProductId          string    `json:"product_id" gorm:"type:varchar(50);unique_index;not null"`
 	ProductName        string    `json:"product_name" gorm:"type:varchar(50);unique_index;not null"`
