@@ -101,7 +101,7 @@ func SettleBetsPG(c *fiber.Ctx) error {
 			"error":   err.Error(),
 		})
 	}
-
+	fmt.Println("body = ", body)
 	// find user
 	data, err := settleServer(body)
 	if err != nil {
