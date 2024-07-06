@@ -111,8 +111,7 @@ func SettleBetsPG(c *fiber.Ctx) error {
 			"error": "Failed to retrieve balance",
 		})
 	}
-	fmt.Println("data = ")
-	fmt.Println(data)
+	fmt.Println("data = ?", data)
 	// err = database.DB.Transaction(func(tx *gorm.DB) error {
 	// 	var pg100 models.Pg100Transactions
 	// 	pg100.UserID = data.Data.UserID
