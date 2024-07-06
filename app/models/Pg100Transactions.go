@@ -13,15 +13,15 @@ type BalanceCheckResponse struct {
 }
 
 type SettleCheckResponse struct {
-	ID              string      `json:"id"`
-	StatusCode      int         `json:"statusCode"`
-	TimestampMillis int64       `json:"timestampMillis"`
-	ProductId       string      `json:"productId"`
-	Currency        string      `json:"currency"`
-	BalanceBefore   float32     `json:"balanceBefore"`
-	BalanceAfter    float32     `json:"balanceAfter"`
-	Username        string      `json:"username"`
-	Transactions    Transaction `json:"txns"`
+	ID              string        `json:"id"`
+	StatusCode      int           `json:"statusCode"`
+	TimestampMillis int64         `json:"timestampMillis"`
+	ProductId       string        `json:"productId"`
+	Currency        string        `json:"currency"`
+	BalanceBefore   float32       `json:"balanceBefore"`
+	BalanceAfter    float32       `json:"balanceAfter"`
+	Username        string        `json:"username"`
+	Transactions    []Transaction `json:"txns"`
 }
 
 type SettleCheckResponseFormBackend struct {
