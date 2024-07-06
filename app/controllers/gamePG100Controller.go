@@ -123,18 +123,18 @@ func SettleBetsPG(c *fiber.Ctx) error {
 		pg100.ProductId = body.ProductId
 		pg100.WalletAmountBefore = data.Data.BalanceBefore
 		pg100.WalletAmountAfter = data.Data.BalanceAfter
-		pg100.BetAmount = body.Transactions.BetAmount
-		pg100.PayoutAmount = body.Transactions.PayoutAmount
-		pg100.RoundId = body.Transactions.RoundID
-		pg100.TxnId = body.Transactions.TxnID
-		pg100.Status = body.Transactions.Status
-		pg100.GameCode = body.Transactions.GameCode
-		pg100.GameId = body.Transactions.GameCode
-		pg100.PlayInfo = body.Transactions.PlayInfo
-		pg100.IsEndRound = body.Transactions.IsEndRound
+		pg100.BetAmount = body.Transactions[0].BetAmount
+		pg100.PayoutAmount = body.Transactions[0].PayoutAmount
+		pg100.RoundId = body.Transactions[0].RoundID
+		pg100.TxnId = body.Transactions[0].TxnID
+		pg100.Status = body.Transactions[0].Status
+		pg100.GameCode = body.Transactions[0].GameCode
+		pg100.GameId = body.Transactions[0].GameCode
+		pg100.PlayInfo = body.Transactions[0].PlayInfo
+		pg100.IsEndRound = body.Transactions[0].IsEndRound
 		pg100.CreatedAt = time.Now()
 
-		var winLoss = body.Transactions.PayoutAmount - body.Transactions.BetAmount
+		var winLoss = body.Transactions[0].PayoutAmount - body.Transactions[0].BetAmount
 		var status = ""
 		if winLoss > 0 {
 			status = "WIN"
@@ -148,15 +148,15 @@ func SettleBetsPG(c *fiber.Ctx) error {
 		report.UserID = data.Data.UserID
 		report.Username = data.Data.Username
 		report.AgentID = data.Data.AgentID
-		report.RoundId = body.Transactions.RoundID
+		report.RoundId = body.Transactions[0].RoundID
 		report.ProductId = body.ProductId
 		report.ProductName = body.ProductId
-		report.GameId = body.Transactions.GameCode
-		report.GameName = body.Transactions.GameCode
+		report.GameId = body.Transactions[0].GameCode
+		report.GameName = body.Transactions[0].GameCode
 		report.WalletAmountBefore = data.Data.BalanceBefore
 		report.WalletAmountAfter = data.Data.BalanceAfter
-		report.BetAmount = body.Transactions.BetAmount
-		report.BetResult = body.Transactions.PayoutAmount
+		report.BetAmount = body.Transactions[0].BetAmount
+		report.BetResult = body.Transactions[0].PayoutAmount
 		report.BetWinloss = winLoss
 		report.Status = status
 		report.IP = utils.GetIP()
@@ -209,7 +209,7 @@ func settleServer(data models.SettleCheckResponse) (models.ResponseDataSettle, e
 	url := fmt.Sprintf("%s/settleGame", urlBankend)
 	reqBody, err := json.Marshal(map[string]interface{}{
 		"username":  data.Username,
-		"betsettle": data.Transactions.PayoutAmount - data.Transactions.BetAmount,
+		"betsettle": data.Transactions[0].PayoutAmount - data.Transactions[0].BetAmount,
 	})
 	if err != nil {
 		return models.ResponseDataSettle{}, fmt.Errorf("failed to marshal request body: %v", err)
