@@ -102,7 +102,6 @@ func SettleBetsPG(c *fiber.Ctx) error {
 		})
 	}
 
-	fmt.Println("111111111111111111111")
 	// find user
 	data, err := settleServer(body)
 	if err != nil {
@@ -205,6 +204,7 @@ func SettleBetsPG(c *fiber.Ctx) error {
 
 func settleServer(data models.SettleCheckResponse) (models.ResponseDataSettle, error) {
 	url := fmt.Sprintf("%s/settleGame", urlBankend)
+	fmt.Println("amount = ", data.Transactions[0].PayoutAmount-data.Transactions[0].BetAmount)
 	reqBody, err := json.Marshal(map[string]interface{}{
 		"username":  data.Username,
 		"betsettle": data.Transactions[0].PayoutAmount - data.Transactions[0].BetAmount,
