@@ -72,10 +72,10 @@ type Pg100Transactions struct {
 	AgentID            uint      `json:"agent_id" gorm:"primarykey;type:int2;index;not null"`
 	Username           string    `json:"username" gorm:"type:varchar(50);index;not null"`
 	ProductId          string    `json:"product_id" gorm:"type:varchar(50);index;not null"`
-	WalletAmountBefore float32   `json:"wallet_amount_before" sql:"type:decimal(10,2);not null"`
-	WalletAmountAfter  float32   `json:"wallet_amount_after" sql:"type:decimal(10,2);not null"`
-	BetAmount          float32   `json:"bet_amount" sql:"type:decimal(10,2);not null"`
-	PayoutAmount       float32   `json:"payouta_mount" sql:"type:decimal(10,2);not null"`
+	WalletAmountBefore float32   `json:"wallet_amount_before" gorm:"type:decimal(10,2);not null"`
+	WalletAmountAfter  float32   `json:"wallet_amount_after" gorm:"type:decimal(10,2);not null"`
+	BetAmount          float32   `json:"bet_amount" gorm:"type:decimal(10,2);not null"`
+	PayoutAmount       float32   `json:"payouta_mount" gorm:"type:decimal(10,2);not null"`
 	RoundId            string    `json:"round_id" gorm:"type:varchar(50);not null"`
 	TxnId              string    `json:"txn_id" gorm:"type:varchar(50);not null"`
 	Status             string    `json:"status" gorm:"type:varchar(15);not null"`
