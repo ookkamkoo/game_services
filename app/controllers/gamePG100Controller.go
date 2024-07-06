@@ -4,12 +4,15 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"game_services/app/database"
+	"game_services/app/models"
 	"game_services/app/utils"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
 const privateURLPG100 = "https://agent-api.pgf-asw0uz.com"
@@ -25,55 +28,8 @@ type BodyLoginPG struct {
 	Language     string `json:"language"`
 }
 
-type BalanceCheckResponse struct {
-	ID              string  `json:"id"`
-	StatusCode      int     `json:"statusCode"`
-	TimestampMillis int64   `json:"timestampMillis"`
-	ProductId       string  `json:"productId"`
-	Currency        string  `json:"currency"`
-	Balance         float32 `json:"balance"`
-	Username        string  `json:"username"`
-}
-
-type SettleCheckResponse struct {
-	ID              string      `json:"id"`
-	StatusCode      int         `json:"statusCode"`
-	TimestampMillis int64       `json:"timestampMillis"`
-	ProductId       string      `json:"productId"`
-	Currency        string      `json:"currency"`
-	BalanceBefore   float32     `json:"balanceBefore"`
-	BalanceAfter    float32     `json:"balanceAfter"`
-	Username        string      `json:"username"`
-	Transactions    Transaction `json:"txns"`
-}
-
-type Transaction struct {
-	ID            string  `json:"id"`
-	Status        string  `json:"status"`
-	RoundID       string  `json:"roundId"`
-	BetAmount     float32 `json:"betAmount"`
-	PayoutAmount  float32 `json:"payoutAmount"`
-	GameCode      string  `json:"gameCode"`
-	PlayInfo      string  `json:"playInfo"`
-	TxnID         string  `json:"txnId"`
-	IsFreeSpin    bool    `json:"isFreeSpin"`
-	BuyFeature    bool    `json:"buyFeature"`
-	BonusFreeSpin bool    `json:"bonusFreeSpin"`
-	IsEndRound    bool    `json:"isEndRound"`
-}
-
-type ResponseData struct {
-	Data struct {
-		Balance  float32 `json:"balance"`
-		Username string  `json:"username"`
-	} `json:"data"`
-	Message string `json:"message"`
-	Status  string `json:"status"`
-	Time    string `json:"time"`
-}
-
 func CheckBalancePG(c *fiber.Ctx) error {
-	var body BalanceCheckResponse
+	var body models.BalanceCheckResponse
 	if err := c.BodyParser(&body); err != nil {
 		fmt.Println(err)
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -101,18 +57,18 @@ func CheckBalancePG(c *fiber.Ctx) error {
 	return c.JSON(body)
 }
 
-func getBalanceServerPG(username string) (ResponseData, error) {
+func getBalanceServerPG(username string) (models.ResponseData, error) {
 	url := fmt.Sprintf("%s/getBalance", urlBankend)
 	reqBody, err := json.Marshal(map[string]interface{}{
 		"username": username,
 	})
 	fmt.Println(username)
 	if err != nil {
-		return ResponseData{}, fmt.Errorf("failed to marshal request body: %v", err)
+		return models.ResponseData{}, fmt.Errorf("failed to marshal request body: %v", err)
 	}
 	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(reqBody))
 	if err != nil {
-		return ResponseData{}, fmt.Errorf("failed to create HTTP request: %v", err)
+		return models.ResponseData{}, fmt.Errorf("failed to create HTTP request: %v", err)
 	}
 	// Set the required headers
 	req.Header.Set("x-api-key", apiKeyBankend)
@@ -122,24 +78,24 @@ func getBalanceServerPG(username string) (ResponseData, error) {
 	client := http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return ResponseData{}, fmt.Errorf("failed to send HTTP request: %v", err)
+		return models.ResponseData{}, fmt.Errorf("failed to send HTTP request: %v", err)
 	}
 	defer resp.Body.Close()
 	// Check the response status code
 	if resp.StatusCode != http.StatusOK {
-		return ResponseData{}, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		return models.ResponseData{}, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 	// Decode the response body into a JSON map
-	var responseMap ResponseData
+	var responseMap models.ResponseData
 	if err := json.NewDecoder(resp.Body).Decode(&responseMap); err != nil {
-		return ResponseData{}, fmt.Errorf("failed to decode response body: %v", err)
+		return models.ResponseData{}, fmt.Errorf("failed to decode response body: %v", err)
 	}
 	fmt.Println(responseMap)
 	return responseMap, nil
 }
 
 func SettleBetsPG(c *fiber.Ctx) error {
-	var body SettleCheckResponse
+	var body models.SettleCheckResponse
 	if err := c.BodyParser(&body); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"status":  "error",
@@ -158,6 +114,28 @@ func SettleBetsPG(c *fiber.Ctx) error {
 			"error": "Failed to retrieve balance",
 		})
 	}
+
+	err = database.DB.Transaction(func(tx *gorm.DB) error {
+		var pg100 models.Pg100Transactions
+		pg100.UserID = data.UserID
+		pg100.Username = data.Username
+		pg100.AgentID = data.AgentID
+		pg100.ProductId = "pg100"
+		pg100.WalletAmountBefore = data.BalanceBefore
+		pg100.WalletAmountAfter = data.BalanceAfter
+		pg100.BetAmount = body.Transactions.BetAmount
+		pg100.PayoutAmount = body.Transactions.PayoutAmount
+		pg100.RoundId = body.Transactions.RoundID
+		pg100.TxnId = body.Transactions.TxnID
+		pg100.Status = body.Transactions.Status
+
+		pg100.GameCode = body.Transactions.GameCode
+		pg100.GameId = body.Transactions.GameId
+		pg100.PlayInfo = body.Transactions.PlayInfo
+		pg100.IsEndRound = body.Transactions.IsEndRound
+		pg100.CreatedAt = time.Now()
+		return nil
+	})
 	fmt.Println(data)
 	// find user
 	// now := time.Now()
@@ -168,18 +146,18 @@ func SettleBetsPG(c *fiber.Ctx) error {
 	return utils.SuccessResponse(c, body, "success")
 }
 
-func settleServer(data SettleCheckResponse) (SettleCheckResponse, error) {
+func settleServer(data models.SettleCheckResponse) (models.SettleCheckResponseFormBackend, error) {
 	url := fmt.Sprintf("%s/settleGame", urlBankend)
 	reqBody, err := json.Marshal(map[string]interface{}{
 		"username":  data.Username,
 		"betsettle": data.Transactions.PayoutAmount - data.Transactions.BetAmount,
 	})
 	if err != nil {
-		return SettleCheckResponse{}, fmt.Errorf("failed to marshal request body: %v", err)
+		return models.SettleCheckResponseFormBackend{}, fmt.Errorf("failed to marshal request body: %v", err)
 	}
 	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(reqBody))
 	if err != nil {
-		return SettleCheckResponse{}, fmt.Errorf("failed to create HTTP request: %v", err)
+		return models.SettleCheckResponseFormBackend{}, fmt.Errorf("failed to create HTTP request: %v", err)
 	}
 	// Set the required headers
 	req.Header.Set("x-api-key", apiKeyBankend)
@@ -189,20 +167,20 @@ func settleServer(data SettleCheckResponse) (SettleCheckResponse, error) {
 	client := http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return SettleCheckResponse{}, fmt.Errorf("failed to send HTTP request: %v", err)
+		return models.SettleCheckResponseFormBackend{}, fmt.Errorf("failed to send HTTP request: %v", err)
 	}
 	defer resp.Body.Close()
 	// Check the response status code
 	if resp.StatusCode != http.StatusOK {
-		return SettleCheckResponse{}, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		return models.SettleCheckResponseFormBackend{}, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 	// Decode the response body into a JSON map
-	var responseMap SettleCheckResponse
+	var responseMap models.SettleCheckResponse
 	if err := json.NewDecoder(resp.Body).Decode(&responseMap); err != nil {
-		return SettleCheckResponse{}, fmt.Errorf("failed to decode response body: %v", err)
+		return models.SettleCheckResponseFormBackend{}, fmt.Errorf("failed to decode response body: %v", err)
 	}
 	fmt.Println(responseMap)
-	return SettleCheckResponse{}, nil
+	return models.SettleCheckResponseFormBackend{}, nil
 }
 
 func PGGameList() (map[string]interface{}, error) {
