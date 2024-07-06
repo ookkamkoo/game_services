@@ -128,9 +128,8 @@ func SettleBetsPG(c *fiber.Ctx) error {
 		pg100.RoundId = body.Transactions.RoundID
 		pg100.TxnId = body.Transactions.TxnID
 		pg100.Status = body.Transactions.Status
-
 		pg100.GameCode = body.Transactions.GameCode
-		pg100.GameId = body.Transactions.GameId
+		pg100.GameId = body.Transactions.GameCode
 		pg100.PlayInfo = body.Transactions.PlayInfo
 		pg100.IsEndRound = body.Transactions.IsEndRound
 		pg100.CreatedAt = time.Now()
