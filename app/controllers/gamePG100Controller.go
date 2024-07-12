@@ -30,6 +30,11 @@ type BodyLoginPG struct {
 }
 
 func CheckBalancePG(c *fiber.Ctx) error {
+	currentTime := time.Now()
+	formattedTime := currentTime.Format("2006-01-02 15:04:05.000")
+	fmt.Println("===================== CheckBalance ===========================")
+	fmt.Println("Start date and time:", formattedTime)
+
 	var body models.BalanceCheckResponse
 	if err := c.BodyParser(&body); err != nil {
 		fmt.Println(err)
@@ -54,6 +59,11 @@ func CheckBalancePG(c *fiber.Ctx) error {
 	timestamp := now.UnixNano() / int64(time.Millisecond)
 	body.Balance = data.Data.Balance
 	body.TimestampMillis = timestamp
+
+	currentTimes := time.Now()
+	formattedTimes := currentTimes.Format("2006-01-02 15:04:05.000")
+	fmt.Println("End date and time:", formattedTimes)
+	fmt.Println("================================================")
 
 	return c.JSON(body)
 }
@@ -98,7 +108,7 @@ func getBalanceServerPG(username string) (models.ResponseData, error) {
 func SettleBetsPG(c *fiber.Ctx) error {
 	currentTime := time.Now()
 	formattedTime := currentTime.Format("2006-01-02 15:04:05.000")
-	fmt.Println("================================================")
+	fmt.Println("==================== SettleBets ============================")
 	fmt.Println("Start date and time:", formattedTime)
 
 	var body models.SettleCheckResponse
