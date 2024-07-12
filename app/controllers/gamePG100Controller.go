@@ -30,10 +30,10 @@ type BodyLoginPG struct {
 }
 
 func CheckBalancePG(c *fiber.Ctx) error {
-	currentTime := time.Now()
-	formattedTime := currentTime.Format("2006-01-02 15:04:05.000")
+	startTime := time.Now()
+	startFormatted := startTime.Format("2006-01-02 15:04:05.000")
 	fmt.Println("===================== CheckBalance ===========================")
-	fmt.Println("Start date and time:", formattedTime)
+	fmt.Println("Start date and time:", startFormatted)
 
 	var body models.BalanceCheckResponse
 	if err := c.BodyParser(&body); err != nil {
@@ -60,9 +60,12 @@ func CheckBalancePG(c *fiber.Ctx) error {
 	body.Balance = data.Data.Balance
 	body.TimestampMillis = timestamp
 
-	currentTimes := time.Now()
-	formattedTimes := currentTimes.Format("2006-01-02 15:04:05.000")
-	fmt.Println("End date and time:", formattedTimes)
+	endTime := time.Now()
+	endFormatted := endTime.Format("2006-01-02 15:04:05.000")
+	fmt.Println("End date and time:", endFormatted)
+
+	duration := endTime.Sub(startTime)
+	fmt.Println("Duration:", duration)
 	fmt.Println("================================================")
 
 	return c.JSON(body)
@@ -106,10 +109,10 @@ func getBalanceServerPG(username string) (models.ResponseData, error) {
 }
 
 func SettleBetsPG(c *fiber.Ctx) error {
-	currentTime := time.Now()
-	formattedTime := currentTime.Format("2006-01-02 15:04:05.000")
+	startTime := time.Now()
+	startFormatted := startTime.Format("2006-01-02 15:04:05.000")
 	fmt.Println("==================== SettleBets ============================")
-	fmt.Println("Start date and time:", formattedTime)
+	fmt.Println("Start date and time:", startFormatted)
 
 	var body models.SettleCheckResponse
 	if err := c.BodyParser(&body); err != nil {
@@ -218,9 +221,12 @@ func SettleBetsPG(c *fiber.Ctx) error {
 	resq.StatusCode = statusInt
 	fmt.Println("resq = ", resq)
 
-	currentTimes := time.Now()
-	formattedTimes := currentTimes.Format("2006-01-02 15:04:05.000")
-	fmt.Println("End date and time:", formattedTimes)
+	endTime := time.Now()
+	endFormatted := endTime.Format("2006-01-02 15:04:05.000")
+	fmt.Println("End date and time:", endFormatted)
+
+	duration := endTime.Sub(startTime)
+	fmt.Println("Duration:", duration)
 	fmt.Println("================================================")
 
 	return c.JSON(resq)
