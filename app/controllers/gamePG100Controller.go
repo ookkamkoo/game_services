@@ -98,6 +98,7 @@ func getBalanceServerPG(username string) (models.ResponseData, error) {
 func SettleBetsPG(c *fiber.Ctx) error {
 	currentTime := time.Now()
 	formattedTime := currentTime.Format("2006-01-02 15:04:05.000")
+	fmt.Println("================================================")
 	fmt.Println("Start date and time:", formattedTime)
 
 	var body models.SettleCheckResponse
@@ -210,6 +211,7 @@ func SettleBetsPG(c *fiber.Ctx) error {
 	currentTimes := time.Now()
 	formattedTimes := currentTimes.Format("2006-01-02 15:04:05.000")
 	fmt.Println("End date and time:", formattedTimes)
+	fmt.Println("================================================")
 
 	return c.JSON(resq)
 }
