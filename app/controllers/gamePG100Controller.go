@@ -96,6 +96,10 @@ func getBalanceServerPG(username string) (models.ResponseData, error) {
 }
 
 func SettleBetsPG(c *fiber.Ctx) error {
+	currentTime := time.Now()
+	formattedTime := currentTime.Format("2006-01-02 15:04:05")
+	fmt.Println("Start date and time:", formattedTime)
+
 	var body models.SettleCheckResponse
 	if err := c.BodyParser(&body); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -202,6 +206,11 @@ func SettleBetsPG(c *fiber.Ctx) error {
 	resq.BalanceAfter = data.Data.BalanceAfter
 	resq.StatusCode = statusInt
 	fmt.Println("resq = ", resq)
+
+	currentTime = time.Now()
+	formattedTime = currentTime.Format("2006-01-02 15:04:05")
+	fmt.Println("End date and time:", formattedTime)
+
 	return c.JSON(resq)
 }
 
