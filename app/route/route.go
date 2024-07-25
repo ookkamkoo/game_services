@@ -3,6 +3,7 @@ package route
 import (
 	"fmt"
 	"game_services/app/controllers"
+	"game_services/app/middlewares"
 	"game_services/app/migration"
 
 	"github.com/gofiber/fiber/v2"
@@ -31,9 +32,10 @@ func SetRoute(app *fiber.App) {
 	// Define routes for general APIs
 	api := app.Group("/api")
 	// api.Get("/products/:categoryId", controllers.ProductsByCategory)
-	api.Get("/game-list/:categoryId/:productId", controllers.GameList)
+	api.Get("/game-list/:categoryId/:productId", middlewares.GameSeviceMiddleware(), controllers.GameList)
 	// api.Post("/launch-game", controllers.LaunchGame)
-	api.Post("/launch-games/:productId", controllers.LaunchGames)
+	api.Post("/launch-games/:productId", middlewares.GameSeviceMiddleware(), controllers.LaunchGames)
+	api.Get("/getRefoundLost", middlewares.GameSeviceMiddleware(), controllers.GetBetWinLossSummary)
 	// api.Get("/user-information/:username", controllers.UserInformation)
 }
 

@@ -9,6 +9,7 @@ import (
 	"game_services/app/utils"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -16,11 +17,17 @@ import (
 	"gorm.io/gorm"
 )
 
-const privateURLPG100 = "https://agent-api.pgf-asw0uz.com"
-const apiKey = "OWJxTzlTNzdCRzpWWXVjZ200emhjcGFiTnZ3YzlTNWR3YWhXWk1HMmNpOQ=="
+var privateURLPG100 string
+var apiKey string
+var apiKeyBankend string
+var urlBankend string
 
-const apiKeyBankend = "BKw7jpQd8SOv7LuqPFq6MgQ4A1TflW4Ls"
-const urlBankend = "https://backend.scbbbb.com/game-services"
+func init() {
+	privateURLPG100 = os.Getenv("PRIVATE_URL_PG100")
+	apiKey = os.Getenv("apiKey")
+	apiKeyBankend = os.Getenv("apiKeyBankend")
+	urlBankend = os.Getenv("urlBankend")
+}
 
 type BodyLoginPG struct {
 	Username     string `json:"username"`
@@ -302,16 +309,16 @@ func PGGameList() (map[string]interface{}, error) {
 func PGLaunchGames(data BodyLoginPG) (map[string]interface{}, error) {
 	url := fmt.Sprintf("%s/seamless/api/v2/login", privateURLPG100)
 
-	fmt.Println(data.Username)
+	// fmt.Println(data.Username)
 	// Marshal the data to JSON
-	now := time.Now()
-	sec := now.Unix()
-	secStr := strconv.FormatInt(sec, 10)
-	fmt.Println(secStr)
+	// now := time.Now()
+	// sec := now.Unix()
+	// secStr := strconv.FormatInt(sec, 10)
+	// fmt.Println(secStr)
 	reqBody, err := json.Marshal(map[string]interface{}{
 		"username":     data.Username,
 		"gameCode":     data.GameCode,
-		"sessionToken": secStr,
+		"sessionToken": data.Username,
 		"language":     data.Language,
 	})
 	if err != nil {

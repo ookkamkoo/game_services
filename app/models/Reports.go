@@ -2,6 +2,11 @@ package models
 
 import "time"
 
+type BetWinLossSummary struct {
+	UserID     uint    `json:"user_id"`
+	BetWinloss float32 `json:"bet_winloss"`
+}
+
 type Reports struct {
 	ID                 uint      `json:"id" gorm:"primarykey;type:int2"`
 	UserID             uint      `json:"user_id" gorm:"primarykey;type:int2;index;not null"`
