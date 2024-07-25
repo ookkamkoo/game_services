@@ -321,6 +321,7 @@ func PGLaunchGames(data BodyLoginPG) (map[string]interface{}, error) {
 		"sessionToken": secStr,
 		"language":     data.Language,
 	})
+
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal request body: %v", err)
 	}
