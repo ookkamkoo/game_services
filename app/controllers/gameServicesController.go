@@ -363,7 +363,7 @@ func LaunchGames(c *fiber.Ctx) error {
 			"error":   err.Error(),
 		})
 	}
-
+	fmt.Println("ssssssssssssssss")
 	if productId == "pg100" {
 		data, err := PGLaunchGames(body)
 		if err != nil {
