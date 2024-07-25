@@ -12,7 +12,7 @@ import (
 
 func GameSeviceMiddleware() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		apikey := c.Get("X-Api-Key")
+		apikey := c.Get("x-api-key")
 		OsApiKey := os.Getenv("API_KEY_BACKEND")
 		fmt.Println("apikey = ", apikey)
 		fmt.Println("OsApiKey = ", OsApiKey)
