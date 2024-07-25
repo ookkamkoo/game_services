@@ -14,8 +14,9 @@ func GameSeviceMiddleware() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		apikey := c.Get("X-Api-Key")
 		OsApiKey := os.Getenv("API_KEY_BACKEND")
-		fmt.Println(apikey)
-		fmt.Println(OsApiKey)
+		fmt.Println("apikey = ", apikey)
+		fmt.Println("OsApiKey = ", OsApiKey)
+
 		if apikey == OsApiKey {
 			return c.Next()
 		} else {
