@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"fmt"
 	"game_services/app/utils"
 	"net/http"
 	"os"
@@ -12,7 +13,7 @@ import (
 func GameSeviceMiddleware() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		apikey := c.Get("X-Api-Key")
-		// fmt.Println(apikey)
+		fmt.Println(apikey)
 		OsApiKey := os.Getenv("API_KEY_BACKEND")
 		if apikey == OsApiKey {
 			return c.Next()
