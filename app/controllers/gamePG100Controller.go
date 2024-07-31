@@ -192,13 +192,13 @@ func SettleBetsPG(c *fiber.Ctx) error {
 
 		if err := tx.Create(&pg100).Error; err != nil {
 			fmt.Println("pg100")
-			fmt.Println(err)
+			fmt.Println(err.Error())
 			return err
 		}
 
 		if err := tx.Create(&report).Error; err != nil {
 			fmt.Println("report")
-			fmt.Println(err)
+			fmt.Println(err.Error())
 			return err
 		}
 
