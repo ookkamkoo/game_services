@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"gorm.io/gorm"
 )
 
 var privateURLPG100 string
@@ -139,73 +138,71 @@ func SettleBetsPG(c *fiber.Ctx) error {
 		})
 	}
 	fmt.Println("data = ", data)
-	err = database.DB.Transaction(func(tx *gorm.DB) error {
-		var pg100 models.Pg100Transactions
-		pg100.UserID = data.Data.UserID
-		pg100.Username = data.Data.Username
-		pg100.AgentID = data.Data.AgentID
-		pg100.ProductId = body.ProductId
-		pg100.WalletAmountBefore = data.Data.BalanceBefore
-		pg100.WalletAmountAfter = data.Data.BalanceAfter
-		pg100.BetAmount = body.Transactions[0].BetAmount
-		pg100.PayoutAmount = body.Transactions[0].PayoutAmount
-		pg100.RoundId = body.Transactions[0].RoundID
-		pg100.TxnId = body.Transactions[0].TxnID
-		pg100.Status = body.Transactions[0].Status
-		pg100.GameCode = body.Transactions[0].GameCode
-		pg100.GameId = body.Transactions[0].GameCode
-		pg100.PlayInfo = body.Transactions[0].PlayInfo
-		pg100.IsEndRound = body.Transactions[0].IsEndRound
-		pg100.CreatedAt = time.Now()
+	// err = database.DB.Transaction(func(tx *gorm.DB) error {
+	var pg100 models.Pg100Transactions
+	pg100.UserID = data.Data.UserID
+	pg100.Username = data.Data.Username
+	pg100.AgentID = data.Data.AgentID
+	pg100.ProductId = body.ProductId
+	pg100.WalletAmountBefore = data.Data.BalanceBefore
+	pg100.WalletAmountAfter = data.Data.BalanceAfter
+	pg100.BetAmount = body.Transactions[0].BetAmount
+	pg100.PayoutAmount = body.Transactions[0].PayoutAmount
+	pg100.RoundId = body.Transactions[0].RoundID
+	pg100.TxnId = body.Transactions[0].TxnID
+	pg100.Status = body.Transactions[0].Status
+	pg100.GameCode = body.Transactions[0].GameCode
+	pg100.GameId = body.Transactions[0].GameCode
+	pg100.PlayInfo = body.Transactions[0].PlayInfo
+	pg100.IsEndRound = body.Transactions[0].IsEndRound
+	pg100.CreatedAt = time.Now()
 
-		var winLoss = body.Transactions[0].PayoutAmount - body.Transactions[0].BetAmount
-		var status = ""
-		if winLoss > 0 {
-			status = "WIN"
-		} else if winLoss == 0 {
-			status = "EQ"
-		} else {
-			status = "LOSS"
-		}
+	var winLoss = body.Transactions[0].PayoutAmount - body.Transactions[0].BetAmount
+	var status = ""
+	if winLoss > 0 {
+		status = "WIN"
+	} else if winLoss == 0 {
+		status = "EQ"
+	} else {
+		status = "LOSS"
+	}
 
-		var report models.Reports
-		report.UserID = data.Data.UserID
-		report.Username = data.Data.Username
-		report.AgentID = data.Data.AgentID
-		report.RoundId = body.Transactions[0].RoundID
-		report.ProductId = body.ProductId
-		report.ProductName = body.ProductId
-		report.GameId = body.Transactions[0].GameCode
-		report.GameName = body.Transactions[0].GameCode
-		report.WalletAmountBefore = data.Data.BalanceBefore
-		report.WalletAmountAfter = data.Data.BalanceAfter
-		report.BetAmount = body.Transactions[0].BetAmount
-		report.BetResult = body.Transactions[0].PayoutAmount
-		report.BetWinloss = winLoss
-		report.Status = status
-		report.IP = utils.GetIP()
-		report.Description = ""
-		report.CreatedAt = time.Now()
+	var report models.Reports
+	report.UserID = data.Data.UserID
+	report.Username = data.Data.Username
+	report.AgentID = data.Data.AgentID
+	report.RoundId = body.Transactions[0].RoundID
+	report.ProductId = body.ProductId
+	report.ProductName = body.ProductId
+	report.GameId = body.Transactions[0].GameCode
+	report.GameName = body.Transactions[0].GameCode
+	report.WalletAmountBefore = data.Data.BalanceBefore
+	report.WalletAmountAfter = data.Data.BalanceAfter
+	report.BetAmount = body.Transactions[0].BetAmount
+	report.BetResult = body.Transactions[0].PayoutAmount
+	report.BetWinloss = winLoss
+	report.Status = status
+	report.IP = utils.GetIP()
+	report.Description = ""
+	report.CreatedAt = time.Now()
 
-		fmt.Println("report = ")
-		fmt.Println(report)
+	fmt.Println("report = ")
+	fmt.Println(report)
 
-		if err := tx.Create(&pg100).Error; err != nil {
-			fmt.Println("pg100")
-			fmt.Println(err.Error())
-			return err
-		}
+	if err := database.DB.Create(&pg100).Error; err != nil {
+		fmt.Println("pg100")
+		fmt.Println(err)
+		return err
+	}
 
-		if err := tx.Create(&report).Error; err != nil {
-			fmt.Println("report")
-			fmt.Println(err.Error())
-			return err
-		} else {
-			fmt.Println("create report")
-		}
+	if err := database.DB.Create(&report).Error; err != nil {
+		fmt.Println("report")
+		fmt.Println(err)
+		return err
+	}
 
-		return nil
-	})
+	// 	return nil
+	// })
 
 	var resq models.SettleCheckResponse
 	now := time.Now()
