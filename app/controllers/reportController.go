@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"game_services/app/database"
 	"game_services/app/models"
 	"game_services/app/utils"
@@ -24,6 +25,9 @@ func GetBetWinLossSummary(c *fiber.Ctx) error {
 	layout := "2006-01-02 15:04:05"
 	yesterdayStartFormatted := yesterdayStart.Format(layout)
 	yesterdayEndFormatted := yesterdayEnd.Format(layout)
+
+	fmt.Println(yesterdayStartFormatted)
+	fmt.Println(yesterdayEndFormatted)
 
 	if err := database.DB.Model(&models.Reports{}).
 		Select("user_id, CAST(SUM(bet_winloss) AS FLOAT) as bet_winloss").
