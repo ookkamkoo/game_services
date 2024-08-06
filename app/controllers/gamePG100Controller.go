@@ -202,6 +202,7 @@ func SettleBetsPG(c *fiber.Ctx) error {
 		fmt.Println(errs.Error())
 		return errs
 	}
+	fmt.Println("add report")
 
 	var resq models.SettleCheckResponse
 	now := time.Now()
