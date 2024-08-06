@@ -24,6 +24,6 @@ type Reports struct {
 	BetWinloss         float32   `json:"bet_winloss" gorm:"type:decimal(10,2);not null"`
 	Status             string    `json:"status" gorm:"type:varchar(15);not null"`
 	IP                 string    `json:"ip" gorm:"type:varchar(15);not null"`
-	Description        string    `json:"description" gorm:"type:varchar(200)"`
+	Description        string    `json:"description" gorm:"type:varchar(100)"`
 	CreatedAt          time.Time `json:"created_at"`
 }
