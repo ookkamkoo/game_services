@@ -166,6 +166,7 @@ func SettleBetsPG(c *fiber.Ctx) error {
 	} else {
 		status = "LOSS"
 	}
+
 	var report models.Reports
 	report.UserID = data.Data.UserID
 	report.Username = data.Data.Username
@@ -188,18 +189,20 @@ func SettleBetsPG(c *fiber.Ctx) error {
 	fmt.Println("report = ")
 	fmt.Println(report)
 
-	if errs := database.DB.Create(&report).Error; errs != nil {
-		fmt.Println("report")
-		fmt.Println(errs)
-		return errs
-	}
-	fmt.Println("add report")
-
-	if err = database.DB.Create(&pg100).Error; err != nil {
+	if err := database.DB.Create(&pg100).Error; err != nil {
 		fmt.Println("pg100")
 		fmt.Println(err)
 		return err
 	}
+
+	if err := database.DB.Create(&report).Error; err != nil {
+		fmt.Println("report")
+		fmt.Println(err)
+		return err
+	}
+
+	// 	return nil
+	// })
 
 	var resq models.SettleCheckResponse
 	now := time.Now()
