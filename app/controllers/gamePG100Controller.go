@@ -195,7 +195,7 @@ func SettleBetsPG(c *fiber.Ctx) error {
 		return err
 	}
 
-	if err := database.DB.Save(&report).Error; err != nil {
+	if err := database.DB.Create(&report).Error; err != nil {
 		fmt.Println("report")
 		fmt.Println(err)
 		return err
