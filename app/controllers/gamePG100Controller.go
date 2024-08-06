@@ -195,14 +195,11 @@ func SettleBetsPG(c *fiber.Ctx) error {
 		return err
 	}
 
-	if err := database.DB.Create(&report).Error; err != nil {
+	if errs := database.DB.Create(&report).Error; errs != nil {
 		fmt.Println("report")
 		fmt.Println(err)
-		return err
+		return errs
 	}
-
-	// 	return nil
-	// })
 
 	var resq models.SettleCheckResponse
 	now := time.Now()

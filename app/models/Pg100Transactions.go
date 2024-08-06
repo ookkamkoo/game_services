@@ -68,8 +68,8 @@ type ResponseDataSettle struct {
 
 type Pg100Transactions struct {
 	ID                 uint      `json:"id" gorm:"primarykey;type:int2"`
-	UserID             uint      `json:"user_id" gorm:"primarykey;type:int2;index;not null"`
-	AgentID            uint      `json:"agent_id" gorm:"primarykey;type:int2;index;not null"`
+	UserID             uint      `json:"user_id" gorm:"type:int2;index;not null"`
+	AgentID            uint      `json:"agent_id" gorm:"type:int2;index;not null"`
 	Username           string    `json:"username" gorm:"type:varchar(50);index;not null"`
 	ProductId          string    `json:"product_id" gorm:"type:varchar(50);index;not null"`
 	WalletAmountBefore float32   `json:"wallet_amount_before" gorm:"type:decimal(10,2);not null"`

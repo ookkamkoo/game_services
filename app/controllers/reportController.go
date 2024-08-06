@@ -26,8 +26,8 @@ func GetBetWinLossSummary(c *fiber.Ctx) error {
 	yesterdayEndFormatted := yesterdayEnd.Format(layout)
 
 	if err := database.DB.Model(&models.Reports{}).
-		Select("member_id, CAST(SUM(bet_winloss) AS FLOAT) as bet_winloss").
-		Where("created_at >= ? AND created_at <= ?", yesterdayStartFormatted, yesterdayEndFormatted).Group("member_id").Having("SUM(bet_winloss) < 0").Find(&results).Error; err != nil {
+		Select("user_id, CAST(SUM(bet_winloss) AS FLOAT) as bet_winloss").
+		Where("created_at >= ? AND created_at <= ?", yesterdayStartFormatted, yesterdayEndFormatted).Group("user_id").Having("SUM(bet_winloss) < 0").Find(&results).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error":   true,
 			"message": "Failed to fetch bet win/loss summary",
