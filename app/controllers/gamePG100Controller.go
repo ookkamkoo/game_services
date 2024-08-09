@@ -313,14 +313,14 @@ func PGLaunchGames(data BodyLoginPG) (map[string]interface{}, error) {
 
 	// fmt.Println(data.Username)
 	// Marshal the data to JSON
-	// now := time.Now()
-	// sec := now.Unix()
-	// secStr := strconv.FormatInt(sec, 10)
+	now := time.Now()
+	sec := now.Unix()
+	secStr := strconv.FormatInt(sec, 10)
 	// fmt.Println(secStr)
 	reqBody, err := json.Marshal(map[string]interface{}{
 		"username":     data.Username,
 		"gameCode":     data.GameCode,
-		"sessionToken": data.Username,
+		"sessionToken": secStr,
 		"language":     data.Language,
 	})
 
