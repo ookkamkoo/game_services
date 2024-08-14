@@ -110,6 +110,7 @@ func getBalanceServerPG(username string) (models.ResponseData, error) {
 	if err := json.NewDecoder(resp.Body).Decode(&responseMap); err != nil {
 		return models.ResponseData{}, fmt.Errorf("failed to decode response body: %v", err)
 	}
+	fmt.Println("resp = ")
 	fmt.Println(responseMap)
 	return responseMap, nil
 }
