@@ -29,10 +29,11 @@ func init() {
 }
 
 type BodyLoginPG struct {
-	Username     string `json:"username"`
-	GameCode     string `json:"gameCode"`
-	SessionToken string `json:"sessionToken"`
-	Language     string `json:"language"`
+	Username     string          `json:"username"`
+	GameCode     string          `json:"gameCode"`
+	SessionToken string          `json:"sessionToken"`
+	Language     string          `json:"language"`
+	Setting      json.RawMessage `json:"setting"`
 }
 
 func CheckBalancePG(c *fiber.Ctx) error {
@@ -105,11 +106,13 @@ func getBalanceServerPG(username string) (models.ResponseData, error) {
 	if resp.StatusCode != http.StatusOK {
 		return models.ResponseData{}, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
+
 	// Decode the response body into a JSON map
 	var responseMap models.ResponseData
 	if err := json.NewDecoder(resp.Body).Decode(&responseMap); err != nil {
 		return models.ResponseData{}, fmt.Errorf("failed to decode response body: %v", err)
 	}
+
 	fmt.Println("resp = ")
 	fmt.Println(responseMap)
 	return responseMap, nil
@@ -359,4 +362,38 @@ func PGLaunchGames(data BodyLoginPG) (map[string]interface{}, error) {
 	}
 	fmt.Println(responseMap)
 	return responseMap, nil
+}
+
+func PGSettingGame(data json.RawMessage) error {
+	url := fmt.Sprintf("%s/seamless/api/v2/setGameSetting", privateURLPG100)
+
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(data))
+	if err != nil {
+		return fmt.Errorf("failed to create HTTP request: %v", err)
+	}
+
+	// Set the required headers
+	req.Header.Set("x-api-key", apiKey)
+	req.Header.Set("Content-Type", "application/json")
+
+	// Execute the HTTP request
+	client := http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to send HTTP request: %v", err)
+	}
+	defer resp.Body.Close()
+
+	// Check the response status code
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	}
+
+	// Decode the response body into a JSON map
+	var responseMap map[string]interface{}
+	if err := json.NewDecoder(resp.Body).Decode(&responseMap); err != nil {
+		return fmt.Errorf("failed to decode response body: %v", err)
+	}
+	fmt.Println(responseMap)
+	return nil
 }

@@ -374,6 +374,15 @@ func LaunchGames(c *fiber.Ctx) error {
 			})
 		}
 
+		err = PGSettingGame(body.Setting)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"status":  "error",
+				"message": "Error Setting Game",
+				"error":   err.Error(),
+			})
+		}
+
 		// Return the response map
 		return c.JSON(fiber.Map{
 			"status":  "success",
