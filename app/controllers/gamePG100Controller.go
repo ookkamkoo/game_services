@@ -351,6 +351,7 @@ func PGLaunchGames(data BodyLoginPG) (map[string]interface{}, error) {
 	defer resp.Body.Close()
 
 	// Check the response status code
+	fmt.Println("PGLaunchGames = ", resp.StatusCode)
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
@@ -385,6 +386,7 @@ func PGSettingGame(data json.RawMessage) error {
 	defer resp.Body.Close()
 
 	// Check the response status code
+	fmt.Println("PGSettingGame = ", resp.StatusCode)
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
