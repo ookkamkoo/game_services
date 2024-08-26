@@ -7,6 +7,16 @@ type BetWinLossSummary struct {
 	BetWinloss float32 `json:"bet_winloss"`
 }
 
+type ReportGameRequest struct {
+	DateTimeStart string  `json:"dateTimeStart"`
+	DateTimeEnd   string  `json:"dateTimeEnd"`
+	DateSelect    string  `json:"dateSelect"`
+	Username      string  `json:"username"`
+	Amount        float32 `json:"amount"`
+	Page          int     `json:"page"`
+	PageSize      int     `json:"pageSize"`
+}
+
 type Reports struct {
 	ID                 uint      `json:"id" gorm:"primarykey;type:int2"`
 	UserID             uint      `json:"user_id" gorm:"type:int2;index;not null"`
