@@ -92,6 +92,8 @@ func getBalanceServerPG(username string) (models.ResponseData, error) {
 	if err != nil {
 		return models.ResponseData{}, fmt.Errorf("failed to create HTTP request: %v", err)
 	}
+
+	fmt.Println("key =", apiKeyBankend)
 	// Set the required headers
 	req.Header.Set("x-api-key", apiKeyBankend)
 	req.Header.Set("Content-Type", "application/json")
