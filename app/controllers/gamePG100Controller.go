@@ -80,6 +80,7 @@ func CheckBalancePG(c *fiber.Ctx) error {
 
 func getBalanceServerPG(username string) (models.ResponseData, error) {
 	url := fmt.Sprintf("%s/getBalance", urlBankend)
+	fmt.Println(url)
 	reqBody, err := json.Marshal(map[string]interface{}{
 		"username": username,
 	})
