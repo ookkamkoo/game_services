@@ -354,7 +354,6 @@ func LaunchGames(c *fiber.Ctx) error {
 			"message": "productId is required",
 		})
 	}
-
 	var body BodyLoginPG
 	if err := c.BodyParser(&body); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -363,9 +362,8 @@ func LaunchGames(c *fiber.Ctx) error {
 			"error":   err.Error(),
 		})
 	}
-
+	fmt.Println(body.Setting)
 	if productId == "pg100" {
-
 		err := PGSettingGame(body.Setting)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{

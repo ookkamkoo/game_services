@@ -16,17 +16,25 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-var privateURLPG100 string
-var apiKey string
-var apiKeyBankend string
-var urlBankend string
+// var privateURLPG100 string
+// var apiKey string
+// var apiKeyBankend string
+// var urlBankend string
 
-func init() {
-	privateURLPG100 = os.Getenv("PRIVATE_URL_PG100")
-	apiKey = os.Getenv("apiKey")
-	apiKeyBankend = os.Getenv("apiKeyBankend")
-	urlBankend = os.Getenv("urlBankend")
-}
+// func init() {
+
+// 	err := godotenv.Load()
+// 	if err != nil {
+// 		log.Fatal("Error loading env")
+// 		log.Fatal(err)
+// 	}
+
+// 	privateURLPG100 = os.Getenv("PRIVATE_URL_PG100")
+// 	log.Println("privateURLPG100:", privateURLPG100)
+// 	apiKey = os.Getenv("apiKey")
+// 	apiKeyBankend = os.Getenv("apiKeyBankend")
+// 	urlBankend = os.Getenv("urlBankend")
+// }
 
 type BodyLoginPG struct {
 	Username     string          `json:"username"`
@@ -79,6 +87,9 @@ func CheckBalancePG(c *fiber.Ctx) error {
 }
 
 func getBalanceServerPG(username string) (models.ResponseData, error) {
+	urlBankend := os.Getenv("urlBankend")
+	apiKeyBankend := os.Getenv("apiKeyBankend")
+
 	url := fmt.Sprintf("%s/getBalance", urlBankend)
 	fmt.Println(url)
 	reqBody, err := json.Marshal(map[string]interface{}{
@@ -249,6 +260,9 @@ func SettleBetsPG(c *fiber.Ctx) error {
 }
 
 func settleServer(data models.SettleCheckResponse) (models.ResponseDataSettle, error) {
+	apiKeyBankend := os.Getenv("apiKeyBankend")
+	urlBankend := os.Getenv("urlBankend")
+
 	url := fmt.Sprintf("%s/settleGame", urlBankend)
 	fmt.Println("amount = ", data.Transactions[0].PayoutAmount-data.Transactions[0].BetAmount)
 	reqBody, err := json.Marshal(map[string]interface{}{
@@ -287,6 +301,9 @@ func settleServer(data models.SettleCheckResponse) (models.ResponseDataSettle, e
 }
 
 func PGGameList() (map[string]interface{}, error) {
+	privateURLPG100 := os.Getenv("PRIVATE_URL_PG100")
+	apiKey := os.Getenv("apiKey")
+
 	url := fmt.Sprintf("%s/seamless/api/v2/games", privateURLPG100)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
@@ -316,6 +333,8 @@ func PGGameList() (map[string]interface{}, error) {
 }
 
 func PGLaunchGames(data BodyLoginPG) (map[string]interface{}, error) {
+	privateURLPG100 := os.Getenv("PRIVATE_URL_PG100")
+	apiKey := os.Getenv("apiKey")
 	url := fmt.Sprintf("%s/seamless/api/v2/login", privateURLPG100)
 
 	// fmt.Println(data.Username)
@@ -369,8 +388,9 @@ func PGLaunchGames(data BodyLoginPG) (map[string]interface{}, error) {
 }
 
 func PGSettingGame(data json.RawMessage) error {
+	privateURLPG100 := os.Getenv("PRIVATE_URL_PG100")
+	apiKey := os.Getenv("apiKey")
 	url := fmt.Sprintf("%s/seamless/api/v2/setGameSetting", privateURLPG100)
-
 	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(data))
 	if err != nil {
 		return fmt.Errorf("failed to create HTTP request: %v", err)

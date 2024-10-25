@@ -17,6 +17,11 @@ type ReportGameRequest struct {
 	PageSize      int     `json:"pageSize"`
 }
 
+type ReportGameSent struct {
+	DateTimeStart string `json:"dateTimeStart"`
+	DateTimeEnd   string `json:"dateTimeEnd"`
+}
+
 type Reports struct {
 	ID                 uint      `json:"id" gorm:"primarykey;type:int2"`
 	UserID             uint      `json:"user_id" gorm:"type:int2;index;not null"`

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
 type BetWinLossSummary struct {
@@ -170,6 +171,57 @@ func GetReportGameProduct(c *fiber.Ctx) error {
 	response := fiber.Map{
 		"data": sums,
 	}
+
+	// Return the response
+	return utils.SuccessResponse(c, response, "Get report game successfully.")
+}
+
+func GetReportGameByProductName(c *fiber.Ctx) error {
+
+	// Struct for holding the sums grouped by product_name
+	type SumResult struct {
+		ProductName string  `json:"product_name"`
+		WinLose     float64 `json:"win_lose"`
+	}
+
+	var sums []SumResult
+
+	// Retrieve and validate query parameters
+	dateTimeStart := c.Query("dateTimeStart")
+	dateTimeEnd := c.Query("dateTimeEnd")
+
+	// Check if dates are provided
+	if dateTimeStart == "" || dateTimeEnd == "" {
+		return utils.ErrorResponse(c, http.StatusBadRequest, "Missing required date parameters.", "dateTimeStart or dateTimeEnd is missing.")
+	}
+
+	// Optional: Parse dates to ensure they are valid (assuming format "2006-01-02 15:04:05")
+	_, err := time.Parse("2006-01-02 15:04:05", dateTimeStart)
+	if err != nil {
+		return utils.ErrorResponse(c, http.StatusBadRequest, "Invalid dateTimeStart format.", err.Error())
+	}
+	_, err = time.Parse("2006-01-02 15:04:05", dateTimeEnd)
+	if err != nil {
+		return utils.ErrorResponse(c, http.StatusBadRequest, "Invalid dateTimeEnd format.", err.Error())
+	}
+
+	// Perform the query with GROUP BY product_name
+	if err := database.DB.Model(&models.Reports{}).
+		Select("product_name, SUM(bet_winloss) AS win_lose").
+		Where("created_at BETWEEN ? AND ?", dateTimeStart, dateTimeEnd).
+		Group("product_name").
+		Scan(&sums).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return utils.ErrorResponse(c, http.StatusNotFound, "No records found for the specified date range.", "")
+		}
+		return utils.ErrorResponse(c, http.StatusBadRequest, "Failed to calculate sums.", err.Error())
+	}
+
+	// Prepare the response
+	response := fiber.Map{
+		"data": sums,
+	}
+	fmt.Println(response)
 
 	// Return the response
 	return utils.SuccessResponse(c, response, "Get report game successfully.")
