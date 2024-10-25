@@ -362,22 +362,22 @@ func LaunchGames(c *fiber.Ctx) error {
 			"error":   err.Error(),
 		})
 	}
-	fmt.Println(body.Setting)
 	if productId == "pg100" {
-		err := PGSettingGame(body.Setting)
-		if err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"status":  "error",
-				"message": "Error Setting Game",
-				"error":   err.Error(),
-			})
-		}
 
 		data, err := PGLaunchGames(body)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"status":  "error",
 				"message": "Error Launch Game",
+				"error":   err.Error(),
+			})
+		}
+
+		err = PGSettingGame(body.Setting)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"status":  "error",
+				"message": "Error Setting Game",
 				"error":   err.Error(),
 			})
 		}
