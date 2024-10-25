@@ -390,6 +390,8 @@ func PGLaunchGames(data BodyLoginPG) (map[string]interface{}, error) {
 func PGSettingGame(data json.RawMessage) error {
 	privateURLPG100 := os.Getenv("PRIVATE_URL_PG100")
 	apiKey := os.Getenv("apiKey")
+	fmt.Println(privateURLPG100)
+	fmt.Println(apiKey)
 	url := fmt.Sprintf("%s/seamless/api/v2/setGameSetting", privateURLPG100)
 	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(data))
 	if err != nil {
