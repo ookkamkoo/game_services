@@ -370,7 +370,7 @@ func PGLaunchGames(data BodyLoginPG) (map[string]interface{}, error) {
 
 func PGSettingGame(data json.RawMessage) error {
 	url := fmt.Sprintf("%s/seamless/api/v2/setGameSetting", privateURLPG100)
-
+	fmt.Println(url)
 	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(data))
 	if err != nil {
 		return fmt.Errorf("failed to create HTTP request: %v", err)
