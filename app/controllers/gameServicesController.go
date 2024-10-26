@@ -365,6 +365,7 @@ func LaunchGames(c *fiber.Ctx) error {
 	}
 
 	if productId == "pg100" {
+		fmt.Println("aaaaaaaaaa")
 		err := PGSettingGame(body.Setting)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
