@@ -363,23 +363,21 @@ func LaunchGames(c *fiber.Ctx) error {
 			"error":   err.Error(),
 		})
 	}
-
 	if productId == "pg100" {
-		fmt.Println("aaaaaaaaaaaaaaaaaaaa")
-		err := PGSettingGame(body.Setting)
-		if err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"status":  "error",
-				"message": "Error Setting Game",
-				"error":   err.Error(),
-			})
-		}
-
 		data, err := PGLaunchGames(body)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"status":  "error",
 				"message": "Error Launch Game",
+				"error":   err.Error(),
+			})
+		}
+
+		err = PGSettingGame(body.Setting)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"status":  "error",
+				"message": "Error Setting Game",
 				"error":   err.Error(),
 			})
 		}
@@ -393,4 +391,28 @@ func LaunchGames(c *fiber.Ctx) error {
 	} else {
 		return utils.SuccessResponse(c, "success", "success")
 	}
+}
+
+func SettingGamePg100(c *fiber.Ctx) error {
+	var body json.RawMessage
+	if err := c.BodyParser(&body); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"status":  "error",
+			"message": "Invalid request payload",
+			"error":   err.Error(),
+		})
+	}
+
+	fmt.Println("gameConfigJSON:", string(body))
+	err := PGSettingGame(body)
+
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":  "error",
+			"message": "Error Setting Game",
+			"error":   err.Error(),
+		})
+	}
+
+	return utils.SuccessResponse(c, "success", "success")
 }

@@ -5,6 +5,7 @@ import (
 	"game_services/app/controllers"
 	"game_services/app/middlewares"
 	"game_services/app/migration"
+	"game_services/app/utils"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -31,16 +32,17 @@ func SetRoute(app *fiber.App) {
 
 	// Define routes for general APIs
 	api := app.Group("/api")
-	// api.Get("/products/:categoryId", controllers.ProductsByCategory)
+	api.Get("/products/:categoryId", controllers.ProductsByCategory)
 	api.Get("/game-list/:categoryId/:productId", middlewares.GameSeviceMiddleware(), controllers.GameList)
 	// api.Post("/launch-game", controllers.LaunchGame)
 	api.Post("/launch-games/:productId", controllers.LaunchGames)
-	api.Post("/settingPg", controllers.LaunchGames)
+	api.Post("/settingPg", controllers.SettingGamePg100)
 	api.Get("/getRefoundLost", middlewares.GameSeviceMiddleware(), controllers.GetBetWinLossSummary)
 	api.Post("/getReportGame", middlewares.GameSeviceMiddleware(), controllers.GetReportGame)
 	api.Get("/getReportGameProduct", middlewares.GameSeviceMiddleware(), controllers.GetReportGameProduct)
 	api.Get("/getReportGameByProductName", middlewares.GameSeviceMiddleware(), controllers.GetReportGameByProductName)
 	// api.Get("/user-information/:username", controllers.UserInformation)
+	utils.Encrypt("", "")
 }
 
 func migrateHandler(c *fiber.Ctx) error {
