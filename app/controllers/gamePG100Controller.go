@@ -40,7 +40,7 @@ func CheckBalancePG(c *fiber.Ctx) error {
 	fmt.Println("find user")
 	fmt.Println(body)
 	// find user
-	data, err := getBalanceServerPG(body.Username)
+	data, err := getBalanceServer(body.Username)
 
 	if err != nil {
 		fmt.Println(err)
@@ -66,11 +66,12 @@ func CheckBalancePG(c *fiber.Ctx) error {
 	return c.JSON(body)
 }
 
-func getBalanceServerPG(username string) (models.ResponseData, error) {
+func getBalanceServer(username string) (models.ResponseData, error) {
 	urlBankend := os.Getenv("urlBankend")
 	apiKeyBankend := os.Getenv("apiKeyBankend")
 
 	url := fmt.Sprintf("%s/getBalance", urlBankend)
+	// url := "http://127.0.0.1:3001/services-game/getBalance"
 	fmt.Println(url)
 	reqBody, err := json.Marshal(map[string]interface{}{
 		"username": username,
@@ -314,7 +315,7 @@ func PGLaunchGames(data BodyLoginPG) (map[string]interface{}, error) {
 	privateURLPG100 := os.Getenv("PRIVATE_URL_PG100")
 	apiKey := os.Getenv("apiKey")
 	url := fmt.Sprintf("%s/seamless/api/v2/login", privateURLPG100)
-
+	fmt.Println("sssssssssss")
 	// fmt.Println(data.Username)
 	// Marshal the data to JSON
 	now := time.Now()

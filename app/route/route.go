@@ -5,7 +5,6 @@ import (
 	"game_services/app/controllers"
 	"game_services/app/middlewares"
 	"game_services/app/migration"
-	"game_services/app/utils"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -23,8 +22,7 @@ func SetRoute(app *fiber.App) {
 
 	app.Get("/migration", migrateHandler)
 	// Define routes for game provider APIs
-	gameProvider := app.Group("/game-provider/api")
-	gameProvider.Post("/balance", controllers.GameProvider)
+	// gameProvider.Post("/balance", controllers.GameProvider)
 	// Example: gameProvider.Get("/aa", controllers.GameProviderAA)
 	gamePG := app.Group("/game-pg-provider/")
 	gamePG.Post("/checkBalance", controllers.CheckBalancePG)
@@ -33,16 +31,24 @@ func SetRoute(app *fiber.App) {
 	// Define routes for general APIs
 	api := app.Group("/api")
 	api.Get("/products/:categoryId", controllers.ProductsByCategory)
+
 	api.Get("/game-list/:categoryId/:productId", middlewares.GameSeviceMiddleware(), controllers.GameList)
 	// api.Post("/launch-game", controllers.LaunchGame)
-	api.Post("/launch-games/:productId", controllers.LaunchGames)
+	api.Post("/launch-games/:productId", middlewares.GameSeviceMiddleware(), controllers.LaunchGames)
 	api.Post("/settingPg", controllers.SettingGamePg100)
 	api.Get("/getRefoundLost", middlewares.GameSeviceMiddleware(), controllers.GetBetWinLossSummary)
 	api.Post("/getReportGame", middlewares.GameSeviceMiddleware(), controllers.GetReportGame)
 	api.Get("/getReportGameProduct", middlewares.GameSeviceMiddleware(), controllers.GetReportGameProduct)
 	api.Get("/getReportGameByProductName", middlewares.GameSeviceMiddleware(), controllers.GetReportGameByProductName)
 	// api.Get("/user-information/:username", controllers.UserInformation)
-	utils.Encrypt("", "")
+
+	// Gplay call back
+	gameProvider := app.Group("/game-provider/api")
+	gameProvider.Post("/balance", controllers.BalanceProvider)
+	gameProvider.Post("/debit", controllers.DebitProvider)
+	gameProvider.Post("/credit", controllers.CreditProvider)
+	gameProvider.Post("/rollback", controllers.RollbackProvider)
+	gameProvider.Post("/reward", controllers.RewardProvider)
 }
 
 func migrateHandler(c *fiber.Ctx) error {
