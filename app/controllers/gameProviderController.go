@@ -130,6 +130,7 @@ func BalanceProvider(c *fiber.Ctx) error {
 
 	data, err := getBalanceServer(req.PlayerUsername)
 	responseTime := time.Now().Format("2006-01-02 15:04:05")
+	fmt.Println(data)
 	if err != nil {
 		fmt.Println(err)
 		fmt.Println("Error retrieving balance:", err)
@@ -141,6 +142,9 @@ func BalanceProvider(c *fiber.Ctx) error {
 			"responseTime": responseTime,
 			"responseUid":  req.RequestUid,
 		}
+
+		fmt.Println("response")
+		fmt.Println(response)
 		return utils.SuccessResponse(c, response, "success")
 	}
 
@@ -152,7 +156,7 @@ func BalanceProvider(c *fiber.Ctx) error {
 		"responseTime": responseTime,
 		"responseUid":  req.RequestUid,
 	}
-	fmt.Println("BalanceProvider")
+	fmt.Println("response")
 	fmt.Println(response)
 	// Return the JSON response
 	return utils.SuccessResponse(c, response, "success")
