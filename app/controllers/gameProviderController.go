@@ -151,6 +151,7 @@ func BalanceProvider(c *fiber.Ctx) error {
 		"responseTime": responseTime,
 		"responseUid":  req.RequestUid,
 	}
+	fmt.Println("BalanceProvider")
 	fmt.Println(response)
 	// Return the JSON response
 	return utils.SuccessResponse(c, response, "success")
