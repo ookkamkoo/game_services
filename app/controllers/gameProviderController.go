@@ -132,7 +132,7 @@ func BalanceProvider(c *fiber.Ctx) error {
 	fmt.Println("data")
 	data, err := getBalanceServer(req.PlayerUsername)
 	responseTime := time.Now().Format("2006-01-02 15:04:05")
-	fmt.Println(data)
+	// fmt.Println(data)
 	if err != nil {
 		fmt.Println(err)
 		fmt.Println("Error retrieving balance:", err)
