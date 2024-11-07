@@ -154,7 +154,7 @@ func BalanceProvider(c *fiber.Ctx) error {
 	response := fiber.Map{
 		"code":         0,
 		"msg":          "Successful",
-		"balance":      data.Data.Balance,
+		"balance":      100.00,
 		"responseTime": responseTime,
 		"responseUid":  req.RequestUid,
 	}
@@ -162,7 +162,6 @@ func BalanceProvider(c *fiber.Ctx) error {
 	fmt.Println(response)
 	// Return the JSON response
 	return utils.SuccessResponse(c, response, "success")
-	// return utils.SuccessResponse(c, "success", "success")
 }
 
 func DebitProvider(c *fiber.Ctx) error {
