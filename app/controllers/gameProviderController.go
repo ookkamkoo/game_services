@@ -120,6 +120,7 @@ func BalanceProvider(c *fiber.Ctx) error {
 	// Parse JSON body into BalanceRequest struct
 	var req BalanceRequest
 	if err := c.BodyParser(&req); err != nil {
+		fmt.Println("Invalid request")
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"code": -1,
 			"msg":  "Invalid request",
