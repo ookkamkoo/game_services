@@ -147,7 +147,8 @@ func BalanceProvider(c *fiber.Ctx) error {
 
 		fmt.Println("response")
 		fmt.Println(response)
-		return utils.SuccessResponse(c, response, "success")
+		return c.JSON(response)
+		// return utils.SuccessResponse(c, response, "success")
 	}
 
 	// Prepare the response
@@ -161,7 +162,7 @@ func BalanceProvider(c *fiber.Ctx) error {
 	fmt.Println("response")
 	fmt.Println(response)
 	// Return the JSON response
-	return utils.SuccessResponse(c, response, "success")
+	return c.JSON(response)
 }
 
 func DebitProvider(c *fiber.Ctx) error {
