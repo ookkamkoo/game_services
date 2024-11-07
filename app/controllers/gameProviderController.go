@@ -118,49 +118,52 @@ type RewardRequest struct {
 func BalanceProvider(c *fiber.Ctx) error {
 	fmt.Println("BalanceProvider")
 	// Parse JSON body into BalanceRequest struct
-	var req BalanceRequest
-	if err := c.BodyParser(&req); err != nil {
-		fmt.Println("Invalid request")
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"code": -1,
-			"msg":  "Invalid request",
-		})
-	}
+	body := c.Body()
+	fmt.Println("Request Body:", string(body))
+	// var req BalanceRequest
+	// if err := c.BodyParser(&req); err != nil {
+	// 	fmt.Println("Invalid request")
+	// 	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+	// 		"code": -1,
+	// 		"msg":  "Invalid request",
+	// 	})
+	// }
 
-	// balance := 1000 // Replace with actual balance logic
-	fmt.Println("data")
-	data, err := getBalanceServer(req.PlayerUsername)
-	responseTime := time.Now().Format("2006-01-02 15:04:05")
-	fmt.Println(data)
-	if err != nil {
-		fmt.Println(err)
-		fmt.Println("Error retrieving balance:", err)
+	// // balance := 1000 // Replace with actual balance logic
+	// fmt.Println("data")
+	// data, err := getBalanceServer(req.PlayerUsername)
+	// responseTime := time.Now().Format("2006-01-02 15:04:05")
+	// fmt.Println(data)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	fmt.Println("Error retrieving balance:", err)
 
-		response := fiber.Map{
-			"code":         1006,
-			"msg":          "Player has Insufficient Balance to Place Bet",
-			"balance":      0,
-			"responseTime": responseTime,
-			"responseUid":  req.RequestUid,
-		}
+	// 	response := fiber.Map{
+	// 		"code":         1006,
+	// 		"msg":          "Player has Insufficient Balance to Place Bet",
+	// 		"balance":      0,
+	// 		"responseTime": responseTime,
+	// 		"responseUid":  req.RequestUid,
+	// 	}
 
-		fmt.Println("response")
-		fmt.Println(response)
-		return utils.SuccessResponse(c, response, "success")
-	}
+	// 	fmt.Println("response")
+	// 	fmt.Println(response)
+	// 	return utils.SuccessResponse(c, response, "success")
+	// }
 
-	// Prepare the response
-	response := fiber.Map{
-		"code":         0,
-		"msg":          "Successful",
-		"balance":      data.Data.Balance,
-		"responseTime": responseTime,
-		"responseUid":  req.RequestUid,
-	}
-	fmt.Println("response")
-	fmt.Println(response)
-	// Return the JSON response
-	return utils.SuccessResponse(c, response, "success")
+	// // Prepare the response
+	// response := fiber.Map{
+	// 	"code":         0,
+	// 	"msg":          "Successful",
+	// 	"balance":      data.Data.Balance,
+	// 	"responseTime": responseTime,
+	// 	"responseUid":  req.RequestUid,
+	// }
+	// fmt.Println("response")
+	// fmt.Println(response)
+	// // Return the JSON response
+	// return utils.SuccessResponse(c, response, "success")
+	return utils.SuccessResponse(c, "success", "success")
 }
 
 func DebitProvider(c *fiber.Ctx) error {
