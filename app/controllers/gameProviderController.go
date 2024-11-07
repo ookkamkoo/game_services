@@ -116,6 +116,7 @@ type RewardRequest struct {
 }
 
 func BalanceProvider(c *fiber.Ctx) error {
+	fmt.Println("BalanceProvider")
 	// Parse JSON body into BalanceRequest struct
 	var req BalanceRequest
 	if err := c.BodyParser(&req); err != nil {
