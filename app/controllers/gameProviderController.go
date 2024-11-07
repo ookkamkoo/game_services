@@ -154,7 +154,7 @@ func BalanceProvider(c *fiber.Ctx) error {
 	response := fiber.Map{
 		"code":         0,
 		"msg":          "Successful",
-		"balance":      100.00,
+		"balance":      data.Data.Balance,
 		"responseTime": responseTime,
 		"responseUid":  req.RequestUid,
 	}
