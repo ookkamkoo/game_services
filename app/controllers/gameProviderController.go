@@ -325,10 +325,10 @@ func CreditProvider(c *fiber.Ctx) error {
 	tran.CreatedAt = time.Now()
 
 	// บันทึกธุรกรรมในตาราง GplayTransactions ภายใต้ transaction
-	if err := database.DB.Create(&tran).Error; err != nil {
-		fmt.Println("Error saving transaction:", err)
-		return err
-	}
+	// if err := database.DB.Create(&tran).Error; err != nil {
+	// 	fmt.Println("Error saving transaction:", err)
+	// 	return err
+	// }
 
 	if eventDetail.IsEndRound {
 
@@ -381,10 +381,10 @@ func CreditProvider(c *fiber.Ctx) error {
 		report.CreatedAt = time.Now()
 
 		// บันทึกข้อมูลรายงานลงฐานข้อมูล
-		if err := database.DB.Create(&report).Error; err != nil {
-			fmt.Println("Error saving report:", err)
-			return err
-		}
+		// if err := database.DB.Create(&report).Error; err != nil {
+		// 	fmt.Println("Error saving report:", err)
+		// 	return err
+		// }
 	}
 
 	// สร้าง response เวลาปัจจุบัน
