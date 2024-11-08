@@ -330,10 +330,10 @@ func CreditProvider(c *fiber.Ctx) error {
 	tran.CreatedAt = time.Now()
 
 	// บันทึกธุรกรรมในตาราง GplayTransactions ภายใต้ transaction
-	// if err := database.DB.Create(&tran).Error; err != nil {
-	// 	fmt.Println("Error saving transaction:", err)
-	// 	return err
-	// }
+	if err := database.DB.Create(&tran).Error; err != nil {
+		fmt.Println("Error saving transaction:", err)
+		return err
+	}
 
 	if eventDetail.IsEndRound {
 
@@ -381,17 +381,17 @@ func CreditProvider(c *fiber.Ctx) error {
 		report.CreatedAt = time.Now()
 
 		// บันทึกข้อมูลรายงานลงฐานข้อมูล
-		// if err := database.DB.Create(&report).Error; err != nil {
-		// 	fmt.Println("Error saving report:", err)
-		// 	return err
-		// }
+		if err := database.DB.Create(&report).Error; err != nil {
+			fmt.Println("Error saving report:", err)
+			return err
+		}
 	}
 
 	// สร้าง response เวลาปัจจุบัน
 	responseTime := time.Now().Format("2006-01-02 15:04:05")
 
 	// Log สำหรับการทำรายการเติมเงินสำเร็จ
-	// fmt.Printf("Credit successful for %s, amount: %.2f, new balance: %.2f\n", req.PlayerUsername, req.Amount, data.Data.BalanceAfter)
+	fmt.Printf("Credit successful for %s, amount: %.2f, new balance: %.2f\n", req.PlayerUsername, req.Amount, data.Data.BalanceAfter)
 
 	// สร้างข้อมูล response และส่งกลับ
 	response := fiber.Map{
