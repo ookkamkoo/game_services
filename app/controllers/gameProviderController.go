@@ -346,8 +346,8 @@ func CreditProvider(c *fiber.Ctx) error {
 		parts := strings.Split(req.TxnId, "-")
 		fmt.Println(parts[1])
 		var sumBetAmount, sumPayoutAmount float32
-		if err := tx.Model(&models.GplayTransactions{}).
-			Where("txn_id LIKE ?", "%"+"1854935643747123712"+"%").
+		if err := tx.Debug().Model(&models.GplayTransactions{}).
+			Where("txn_id LIKE ?", "%"+parts[1]+"%").
 			Select("COALESCE(SUM(bet_amount), 0) AS sum_bet_amount, COALESCE(SUM(payout_amount), 0) AS sum_payout_amount").
 			Scan(&struct {
 				SumBetAmount    *float32 `json:"sum_bet_amount"`
@@ -356,7 +356,7 @@ func CreditProvider(c *fiber.Ctx) error {
 				&sumBetAmount,
 				&sumPayoutAmount,
 			}).Error; err != nil {
-			tx.Rollback() // ยกเลิก transaction หากเกิดข้อผิดพลาด
+			tx.Rollback()
 			fmt.Println("Error calculating sum:", err)
 			return err
 		}
