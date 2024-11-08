@@ -211,7 +211,7 @@ func DebitProvider(c *fiber.Ctx) error {
 	}
 
 	// // Example balance retrieval (replace this with actual balance logic)
-	data, err := settleServer(0, -float32(req.Amount), req.PlayerUsername)
+	data, err := settleServer(-float32(req.Amount), req.PlayerUsername)
 	if err != nil {
 		fmt.Println("Error retrieving balance:", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
