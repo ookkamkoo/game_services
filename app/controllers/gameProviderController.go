@@ -184,6 +184,7 @@ func BalanceProvider(c *fiber.Ctx) error {
 }
 
 func DebitProvider(c *fiber.Ctx) error {
+	fmt.Println("================================")
 	// Parse JSON body into DebitRequest struct
 	var req TransactionRequest
 	if err := c.BodyParser(&req); err != nil {
