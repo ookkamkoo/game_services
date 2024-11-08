@@ -242,7 +242,7 @@ func DebitProvider(c *fiber.Ctx) error {
 	tran.CreatedAt = time.Now()
 
 	if err := database.DB.Create(&tran).Error; err != nil {
-		fmt.Println("pg100")
+		fmt.Println("pg soft")
 		fmt.Println(err)
 		return err
 	}
