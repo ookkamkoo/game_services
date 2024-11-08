@@ -292,6 +292,7 @@ func CreditProvider(c *fiber.Ctx) error {
 			"msg":  "Invalid request format",
 		})
 	}
+	fmt.Println(req)
 	// Parse JSON body into CreditRequest struct
 	// var req CreditRequest
 	// if err := c.BodyParser(&req); err != nil {
