@@ -351,7 +351,7 @@ func CreditProvider(c *fiber.Ctx) error {
 		}
 
 		// คำนวณยอดชนะ/แพ้ และสถานะ
-		var winLoss = float32(req.Amount) - sumGplay.SumBetAmount
+		var winLoss = sumGplay.SumBetAmount - sumGplay.SumPayoutAmount
 		var status = ""
 		if winLoss > 0 {
 			status = "WIN"
@@ -373,8 +373,8 @@ func CreditProvider(c *fiber.Ctx) error {
 		report.GameName = req.GameName
 		report.WalletAmountBefore = data.Data.BalanceBefore
 		report.WalletAmountAfter = data.Data.BalanceAfter
-		report.BetAmount = sumGplay.SumPayoutAmount
-		report.BetResult = float32(req.Amount)
+		report.BetAmount = sumGplay.SumBetAmount
+		report.BetResult = sumGplay.SumPayoutAmount
 		report.BetWinloss = winLoss
 		report.Status = status
 		report.IP = utils.GetIP()
