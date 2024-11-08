@@ -217,7 +217,50 @@ func DebitProvider(c *fiber.Ctx) error {
 	tran.BuyFeature = eventDetail.IsFeatureBuy
 	tran.CreatedAt = time.Now()
 
+	var sumAmount float32
+	if err := database.DB.Model(&models.GplayTransactions{}).
+		Where("status = ? AND round_id = ?", "credit", req.RoundId).
+		Select("COALESCE(SUM(amount), 0)").Scan(&sumAmount).Error; err != nil {
+		fmt.Println("Error calculating sum:", err)
+		return err
+	}
+
+	var winLoss = float32(req.Amount) - sumAmount
+	var status = ""
+	if winLoss > 0 {
+		status = "WIN"
+	} else if winLoss == 0 {
+		status = "EQ"
+	} else {
+		status = "LOSS"
+	}
+
+	var report models.Reports
+	report.UserID = data.Data.UserID
+	report.Username = data.Data.Username
+	report.AgentID = data.Data.AgentID
+	report.RoundId = req.RoundId
+	report.ProductId = req.ProductName
+	report.ProductName = req.ProductName
+	report.GameId = req.GameCode
+	report.GameName = req.GameName
+	report.WalletAmountBefore = data.Data.BalanceBefore
+	report.WalletAmountAfter = data.Data.BalanceAfter
+	report.BetAmount = sumAmount
+	report.BetResult = float32(req.Amount)
+	report.BetWinloss = float32(req.Amount) - sumAmount
+	report.Status = status
+	report.IP = utils.GetIP()
+	report.Description = ""
+	report.CreatedAt = time.Now()
+
 	if err := database.DB.Create(&tran).Error; err != nil {
+		fmt.Println("pg soft")
+		fmt.Println(err)
+		return err
+	}
+
+	if err := database.DB.Create(&report).Error; err != nil {
 		fmt.Println("pg soft")
 		fmt.Println(err)
 		return err
