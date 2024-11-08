@@ -118,6 +118,7 @@ func BalanceProvider(c *fiber.Ctx) error {
 			"msg":  "Invalid request",
 		})
 	}
+	fmt.Println(req)
 
 	// balance := 1000 // Replace with actual balance logic
 	fmt.Println("data")
@@ -171,6 +172,7 @@ func DebitProvider(c *fiber.Ctx) error {
 			"msg":  "Invalid request format",
 		})
 	}
+	fmt.Println(req)
 
 	// Parse EventDetail JSON string into an EventDetail struct
 	var eventDetail EventDetail
@@ -269,7 +271,7 @@ func CreditProvider(c *fiber.Ctx) error {
 			"msg":  "Invalid request format",
 		})
 	}
-
+	fmt.Println(req)
 	// Parse EventDetail JSON string into an EventDetail struct
 	var eventDetail EventDetail
 	if err := json.Unmarshal([]byte(req.EventDetail), &eventDetail); err != nil {
