@@ -129,7 +129,7 @@ func SettleBetsPG(c *fiber.Ctx) error {
 	}
 	fmt.Println("body = ", body)
 	// find user
-	data, err := settleServer(body)
+	data, err := settleServer(body.Transactions[0].PayoutAmount, body.Transactions[0].BetAmount, body.Username)
 	if err != nil {
 		fmt.Println("Error retrieving balance:", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -240,14 +240,14 @@ func SettleBetsPG(c *fiber.Ctx) error {
 	return c.JSON(resq)
 }
 
-func settleServer(data models.SettleCheckResponse) (models.ResponseDataSettle, error) {
+func settleServer(payoutAmount float32, betAmount float32, username string) (models.ResponseDataSettle, error) {
 	apiKeyBankend := os.Getenv("apiKeyBankend")
 	urlBankend := os.Getenv("urlBankend")
 	url := fmt.Sprintf("%s/settleGame", urlBankend)
-	fmt.Println("amount = ", data.Transactions[0].PayoutAmount-data.Transactions[0].BetAmount)
+	fmt.Println("amount = ", payoutAmount-betAmount)
 	reqBody, err := json.Marshal(map[string]interface{}{
-		"username":  data.Username,
-		"betsettle": data.Transactions[0].PayoutAmount - data.Transactions[0].BetAmount,
+		"username":  username,
+		"betsettle": payoutAmount - betAmount,
 	})
 	if err != nil {
 		return models.ResponseDataSettle{}, fmt.Errorf("failed to marshal request body: %v", err)

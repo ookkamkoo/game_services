@@ -182,26 +182,41 @@ func BalanceProvider(c *fiber.Ctx) error {
 
 func DebitProvider(c *fiber.Ctx) error {
 	// Parse JSON body into DebitRequest struct
-	// var req DebitRequest
-	// if err := c.BodyParser(&req); err != nil {
-	// 	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-	// 		"code": -1,
-	// 		"msg":  "Invalid request format",
-	// 	})
-	// }
-
-	var req map[string]interface{}
+	var req TransactionRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"code": -1,
 			"msg":  "Invalid request format",
 		})
 	}
-	fmt.Println(req)
 
 	// // Example balance retrieval (replace this with actual balance logic)
-	// currentBalance := 1000.0 // Example balance; replace with actual balance retrieval
+	// data, err := settleServer(0, -float32(req.Amount), req.PlayerUsername)
+	// if err != nil {
+	// 	fmt.Println("Error retrieving balance:", err)
+	// 	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+	// 		"error": "Failed to retrieve balance",
+	// 	})
+	// }
 	// responseTime := time.Now().Format("2006-01-02 15:04:05")
+
+	// var pg100 models.GplayTransactions
+	// pg100.UserID = data.Data.UserID
+	// pg100.Username = data.Data.Username
+	// pg100.AgentID = data.Data.AgentID
+	// pg100.ProductId = req.ProductId
+	// pg100.WalletAmountBefore = data.Data.BalanceBefore
+	// pg100.WalletAmountAfter = data.Data.BalanceAfter
+	// pg100.BetAmount = float32(req.Amount)
+	// pg100.PayoutAmount = body.Transactions[0].PayoutAmount
+	// pg100.RoundId = body.Transactions[0].RoundID
+	// pg100.TxnId = body.Transactions[0].TxnID
+	// pg100.Status = body.Transactions[0].Status
+	// pg100.GameCode = body.Transactions[0].GameCode
+	// pg100.GameId = body.Transactions[0].GameCode
+	// pg100.PlayInfo = body.Transactions[0].PlayInfo
+	// pg100.IsEndRound = body.Transactions[0].IsEndRound
+	// pg100.CreatedAt = time.Now()
 
 	// // Check if there’s sufficient balance
 	// if currentBalance < req.Amount {
