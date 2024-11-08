@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"game_services/app/database"
 	"game_services/app/models"
 	"game_services/app/utils"
 	"strconv"
@@ -203,27 +204,33 @@ func DebitProvider(c *fiber.Ctx) error {
 		})
 	}
 
-	var pg100 models.GplayTransactions
-	pg100.UserID = data.Data.UserID
-	pg100.AgentID = data.Data.AgentID
-	pg100.Username = data.Data.Username
-	pg100.CategoryId = strconv.Itoa(req.GameCode)
-	pg100.CategoryName = req.CategoryName
-	pg100.ProductId = req.ProductName
-	pg100.ProductCode = req.ProductCode
-	pg100.WalletAmountBefore = data.Data.BalanceBefore
-	pg100.WalletAmountAfter = data.Data.BalanceAfter
-	pg100.BetAmount = float32(req.Amount)
-	pg100.PayoutAmount = 0
-	pg100.RoundId = req.RoundId
-	pg100.TxnId = req.TxnId
-	pg100.Status = req.EventName
-	pg100.GameCode = strconv.Itoa(req.GameCode)
-	pg100.PlayInfo = req.GameName
-	pg100.IsEndRound = false
-	pg100.IsFreeSpin = req.EventDetail.IsFeature
-	pg100.BuyFeature = req.EventDetail.IsFeatureBuy
-	pg100.CreatedAt = time.Now()
+	var tran models.GplayTransactions
+	tran.UserID = data.Data.UserID
+	tran.AgentID = data.Data.AgentID
+	tran.Username = data.Data.Username
+	tran.CategoryId = strconv.Itoa(req.GameCode)
+	tran.CategoryName = req.CategoryName
+	tran.ProductId = req.ProductName
+	tran.ProductCode = req.ProductCode
+	tran.WalletAmountBefore = data.Data.BalanceBefore
+	tran.WalletAmountAfter = data.Data.BalanceAfter
+	tran.BetAmount = float32(req.Amount)
+	tran.PayoutAmount = 0
+	tran.RoundId = req.RoundId
+	tran.TxnId = req.TxnId
+	tran.Status = req.EventName
+	tran.GameCode = strconv.Itoa(req.GameCode)
+	tran.PlayInfo = req.GameName
+	tran.IsEndRound = false
+	tran.IsFreeSpin = req.EventDetail.IsFeature
+	tran.BuyFeature = req.EventDetail.IsFeatureBuy
+	tran.CreatedAt = time.Now()
+
+	if err := database.DB.Create(&tran).Error; err != nil {
+		fmt.Println("pg100")
+		fmt.Println(err)
+		return err
+	}
 
 	currentBalance, err := getBalanceServer(req.PlayerUsername)
 	responseTime := time.Now().Format("2006-01-02 15:04:05")
@@ -235,7 +242,8 @@ func DebitProvider(c *fiber.Ctx) error {
 			"responseTime": responseTime,
 			"responseUid":  uuid.New().String(),
 		}
-		return utils.SuccessResponse(c, response, "error")
+		fmt.Println(response)
+		return c.JSON(response)
 	}
 
 	if currentBalance.Data.Balance < float32(req.Amount) {
@@ -250,9 +258,10 @@ func DebitProvider(c *fiber.Ctx) error {
 			"responseTime": responseTime,
 			"responseUid":  uuid.New().String(),
 		}
-		return utils.SuccessResponse(c, response, "error")
+		fmt.Println(response)
+		return c.JSON(response)
 	}
-
+	fmt.Println("update")
 	// Deduct the requested amount from balance
 	updatedBalance := currentBalance.Data.Balance - float32(req.Amount)
 
@@ -268,8 +277,10 @@ func DebitProvider(c *fiber.Ctx) error {
 		"responseUid":  uuid.New().String(),
 	}
 
+	fmt.Println(response)
+
 	// Return the success response with the updated balance
-	return utils.SuccessResponse(c, response, "success")
+	return c.JSON(response)
 }
 
 func CreditProvider(c *fiber.Ctx) error {
