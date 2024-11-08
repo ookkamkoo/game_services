@@ -136,7 +136,7 @@ type RewardRequest struct {
 }
 
 func BalanceProvider(c *fiber.Ctx) error {
-	fmt.Println("BalanceProvider")
+	fmt.Println("=============== BalanceProvider =================")
 	// Parse JSON body into BalanceRequest struct
 	var req BalanceRequest
 	if err := c.BodyParser(&req); err != nil {
@@ -185,10 +185,11 @@ func BalanceProvider(c *fiber.Ctx) error {
 }
 
 func DebitProvider(c *fiber.Ctx) error {
-	fmt.Println("================================")
+	fmt.Println("=============== DebitProvider =================")
 	// Parse JSON body into DebitRequest struct
 	var req TransactionRequest
 	if err := c.BodyParser(&req); err != nil {
+		fmt.Println("Invalid request format")
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"code": -1,
 			"msg":  "Invalid request format",
