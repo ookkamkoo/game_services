@@ -372,7 +372,7 @@ func CreditProvider(c *fiber.Ctx) error {
 		report.ProductName = req.ProductName
 		report.GameId = req.GameCode
 		report.GameName = req.GameName
-		report.WalletAmountBefore = data.Data.BalanceBefore
+		report.WalletAmountBefore = data.Data.BalanceBefore + (sumGplay.SumBetAmount - sumGplay.SumPayoutAmount)
 		report.WalletAmountAfter = data.Data.BalanceAfter
 		report.BetAmount = sumGplay.SumBetAmount
 		report.BetResult = sumGplay.SumPayoutAmount
