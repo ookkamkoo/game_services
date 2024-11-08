@@ -347,7 +347,7 @@ func CreditProvider(c *fiber.Ctx) error {
 		fmt.Println(parts[1])
 		var sumBetAmount, sumPayoutAmount float32
 		if err := tx.Model(&models.GplayTransactions{}).
-			Where("txn_id LIKE ?", "%"+parts[1]+"%").
+			Where("txn_id LIKE ?", "%"+"1854935643747123712"+"%").
 			Select("COALESCE(SUM(bet_amount), 0) AS sum_bet_amount, COALESCE(SUM(payout_amount), 0) AS sum_payout_amount").
 			Scan(&struct {
 				SumBetAmount    *float32 `json:"sum_bet_amount"`
@@ -371,8 +371,7 @@ func CreditProvider(c *fiber.Ctx) error {
 		} else {
 			status = "LOSS"
 		}
-		fmt.Println("sumBetAmount = ", sumBetAmount)
-		fmt.Println("sumPayoutAmount = ", sumPayoutAmount)
+		fmt.Printf("Total Bet Amount: %.2f, Total Payout Amount: %.2f\n", sumBetAmount, sumPayoutAmount)
 		// เพิ่มรายการใน Reports ภายใต้ transaction
 		var report models.Reports
 		report.UserID = data.Data.UserID
