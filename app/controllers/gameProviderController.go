@@ -368,7 +368,8 @@ func CreditProvider(c *fiber.Ctx) error {
 		} else {
 			status = "LOSS"
 		}
-		fmt.Println("sumAmount = ", sumPayoutAmount)
+		fmt.Println("sumBetAmount = ", sumBetAmount)
+		fmt.Println("sumPayoutAmount = ", sumPayoutAmount)
 		// เพิ่มรายการใน Reports ภายใต้ transaction
 		var report models.Reports
 		report.UserID = data.Data.UserID
