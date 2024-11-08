@@ -6,6 +6,7 @@ import (
 	"game_services/app/database"
 	"game_services/app/models"
 	"game_services/app/utils"
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -342,9 +343,11 @@ func CreditProvider(c *fiber.Ctx) error {
 	if eventDetail.IsEndRound {
 
 		// คำนวณยอดรวมของ Bet ใน round เดียวกันจากธุรกรรมที่เป็น credit
+		parts := strings.Split(req.TxnId, "-")
+		fmt.Println(parts)
 		var sumBetAmount, sumPayoutAmount float32
 		if err := tx.Model(&models.GplayTransactions{}).
-			Where(" txn_id LIKE ?", "%"+req.RoundId+"%").
+			Where("txn_id LIKE ?", "%"+parts[1]+"%").
 			Select("COALESCE(SUM(bet_amount), 0) AS sum_bet_amount, COALESCE(SUM(payout_amount), 0) AS sum_payout_amount").
 			Scan(&struct {
 				SumBetAmount    *float32 `json:"sum_bet_amount"`
