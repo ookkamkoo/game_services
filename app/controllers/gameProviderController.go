@@ -362,6 +362,7 @@ func CreditProvider(c *fiber.Ctx) error {
 		}
 		fmt.Printf("Total Bet Amount: %.2f, Total Payout Amount: %.2f\n", sumGplay.SumBetAmount, sumGplay.SumPayoutAmount)
 		// เพิ่มรายการใน Reports ภายใต้ transaction
+		fmt.Println(data.Data)
 		var report models.Reports
 		report.UserID = data.Data.UserID
 		report.Username = data.Data.Username
