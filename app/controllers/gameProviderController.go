@@ -31,6 +31,7 @@ type BalanceRequest struct {
 type EventDetail struct {
 	IsFeature                    bool    `json:"isFeature"`
 	IsFeatureBuy                 bool    `json:"isFeatureBuy"`
+	IsEndRound                   bool    `json:"isEndRound"`
 	JackpotRtpContributionAmount float64 `json:"jackpotRtpContributionAmount"`
 	JackpotWinAmount             float64 `json:"jackpotWinAmount"`
 }
@@ -161,8 +162,8 @@ func DebitProvider(c *fiber.Ctx) error {
 	fmt.Println("=============== DebitProvider =================")
 	// Parse JSON body into DebitRequest struct
 
-	// body := c.Body()
-	// fmt.Println("Raw Body:", string(body))
+	body := c.Body()
+	fmt.Println("Raw Body:", string(body))
 
 	var req DebitCreditRequest
 	if err := c.BodyParser(&req); err != nil {
@@ -260,8 +261,8 @@ func CreditProvider(c *fiber.Ctx) error {
 	fmt.Println("=============== CreditProvider =================")
 	// Parse JSON body into DebitRequest struct
 
-	// body := c.Body()
-	// fmt.Println("Raw Body:", string(body))
+	body := c.Body()
+	fmt.Println("Raw Body:", string(body))
 
 	var req DebitCreditRequest
 	if err := c.BodyParser(&req); err != nil {
@@ -309,7 +310,7 @@ func CreditProvider(c *fiber.Ctx) error {
 	tran.Status = req.EventName
 	tran.GameCode = req.GameCode
 	tran.PlayInfo = req.GameName
-	tran.IsEndRound = true
+	tran.IsEndRound = eventDetail.IsEndRound
 	tran.IsFreeSpin = eventDetail.IsFeature
 	tran.BuyFeature = eventDetail.IsFeatureBuy
 	tran.CreatedAt = time.Now()
