@@ -335,16 +335,11 @@ func CreditProvider(c *fiber.Ctx) error {
 		// คำนวณยอดรวมของ Bet ใน round เดียวกันจากธุรกรรมที่เป็น credit
 		parts := strings.Split(req.TxnId, "-")
 		fmt.Println(parts[1])
-		var sumBetAmount, sumPayoutAmount float32
+		var sumPayoutAmount float32
+		// var sum
 		if err := database.DB.Model(&models.GplayTransactions{}).
 			Select("COALESCE(SUM(bet_amount), 0) AS sum_bet_amount, COALESCE(SUM(payout_amount), 0) AS sum_payout_amount").
-			Scan(&struct {
-				SumBetAmount    *float32 `json:"sum_bet_amount"`
-				SumPayoutAmount *float32 `json:"sum_payout_amount"`
-			}{
-				&sumBetAmount,
-				&sumPayoutAmount,
-			}).Error; err != nil {
+			Scan(&sumPayoutAmount).Error; err != nil {
 			fmt.Println("Error calculating sum:", err)
 			return err
 		}
@@ -359,7 +354,7 @@ func CreditProvider(c *fiber.Ctx) error {
 		} else {
 			status = "LOSS"
 		}
-		fmt.Printf("Total Bet Amount: %.2f, Total Payout Amount: %.2f\n", sumBetAmount, sumPayoutAmount)
+		fmt.Printf("Total Bet Amount: %.2f, Total Payout Amount: %.2f\n", sumPayoutAmount, sumPayoutAmount)
 		// เพิ่มรายการใน Reports ภายใต้ transaction
 		var report models.Reports
 		report.UserID = data.Data.UserID
@@ -372,7 +367,7 @@ func CreditProvider(c *fiber.Ctx) error {
 		report.GameName = req.GameName
 		report.WalletAmountBefore = data.Data.BalanceBefore
 		report.WalletAmountAfter = data.Data.BalanceAfter
-		report.BetAmount = sumBetAmount
+		report.BetAmount = sumPayoutAmount
 		report.BetResult = float32(req.Amount)
 		report.BetWinloss = winLoss
 		report.Status = status
