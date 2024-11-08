@@ -209,9 +209,9 @@ func DebitProvider(c *fiber.Ctx) error {
 			"msg":  "Invalid event detail format",
 		})
 	}
-
+	amountSettle := -float32(req.Amount)
 	// // Example balance retrieval (replace this with actual balance logic)
-	data, err := settleServer(float32(req.Amount), req.PlayerUsername)
+	data, err := settleServer(amountSettle, req.PlayerUsername)
 	if err != nil {
 		fmt.Println("Error retrieving balance:", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{

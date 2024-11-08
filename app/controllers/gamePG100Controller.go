@@ -129,8 +129,8 @@ func SettleBetsPG(c *fiber.Ctx) error {
 	}
 	fmt.Println("body = ", body)
 	// find user
-	amount := body.Transactions[0].PayoutAmount - body.Transactions[0].BetAmount
-	data, err := settleServer(amount, body.Username)
+	amountSettle := body.Transactions[0].PayoutAmount - body.Transactions[0].BetAmount
+	data, err := settleServer(amountSettle, body.Username)
 	if err != nil {
 		fmt.Println("Error retrieving balance:", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
