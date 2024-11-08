@@ -339,52 +339,62 @@ func CreditProvider(c *fiber.Ctx) error {
 		return err
 	}
 
-	// คำนวณยอดรวมของ Bet ใน round เดียวกันจากธุรกรรมที่เป็น credit
-	var sumAmount float32
-	if err := tx.Model(&models.GplayTransactions{}).
-		Where("status = ? AND round_id = ?", "debit", req.RoundId).
-		Select("COALESCE(SUM(bet_amount), 0)").Scan(&sumAmount).Error; err != nil {
-		tx.Rollback() // ยกเลิก transaction หากเกิดข้อผิดพลาด
-		fmt.Println("Error calculating sum:", err)
-		return err
-	}
+	if eventDetail.IsEndRound {
 
-	// คำนวณยอดชนะ/แพ้ และสถานะ
-	var winLoss = float32(req.Amount) - sumAmount
-	var status = ""
-	if winLoss > 0 {
-		status = "WIN"
-	} else if winLoss == 0 {
-		status = "EQ"
-	} else {
-		status = "LOSS"
-	}
-	fmt.Println("sumAmount = ", sumAmount)
-	// เพิ่มรายการใน Reports ภายใต้ transaction
-	var report models.Reports
-	report.UserID = data.Data.UserID
-	report.Username = data.Data.Username
-	report.AgentID = data.Data.AgentID
-	report.RoundId = req.RoundId
-	report.ProductId = req.ProductName
-	report.ProductName = req.ProductName
-	report.GameId = req.GameCode
-	report.GameName = req.GameName
-	report.WalletAmountBefore = data.Data.BalanceBefore
-	report.WalletAmountAfter = data.Data.BalanceAfter
-	report.BetAmount = sumAmount
-	report.BetResult = float32(req.Amount)
-	report.BetWinloss = winLoss
-	report.Status = status
-	report.IP = utils.GetIP()
-	report.Description = ""
-	report.CreatedAt = time.Now()
+		// คำนวณยอดรวมของ Bet ใน round เดียวกันจากธุรกรรมที่เป็น credit
+		var sumBetAmount, sumPayoutAmount float32
+		if err := tx.Model(&models.GplayTransactions{}).
+			Where("round_id = ?", req.RoundId).
+			Select("COALESCE(SUM(bet_amount), 0) AS sum_bet_amount, COALESCE(SUM(payout_amount), 0) AS sum_payout_amount").
+			Scan(&struct {
+				SumBetAmount    *float32 `json:"sum_bet_amount"`
+				SumPayoutAmount *float32 `json:"sum_payout_amount"`
+			}{
+				&sumBetAmount,
+				&sumPayoutAmount,
+			}).Error; err != nil {
+			tx.Rollback() // ยกเลิก transaction หากเกิดข้อผิดพลาด
+			fmt.Println("Error calculating sum:", err)
+			return err
+		}
 
-	// บันทึกข้อมูลรายงานลงฐานข้อมูล
-	if err := tx.Create(&report).Error; err != nil {
-		tx.Rollback() // ยกเลิก transaction หากเกิดข้อผิดพลาด
-		fmt.Println("Error saving report:", err)
-		return err
+		// คำนวณยอดชนะ/แพ้ และสถานะ
+		var winLoss = float32(req.Amount) - sumPayoutAmount
+		var status = ""
+		if winLoss > 0 {
+			status = "WIN"
+		} else if winLoss == 0 {
+			status = "EQ"
+		} else {
+			status = "LOSS"
+		}
+		fmt.Println("sumAmount = ", sumPayoutAmount)
+		// เพิ่มรายการใน Reports ภายใต้ transaction
+		var report models.Reports
+		report.UserID = data.Data.UserID
+		report.Username = data.Data.Username
+		report.AgentID = data.Data.AgentID
+		report.RoundId = req.RoundId
+		report.ProductId = req.ProductName
+		report.ProductName = req.ProductName
+		report.GameId = req.GameCode
+		report.GameName = req.GameName
+		report.WalletAmountBefore = data.Data.BalanceBefore
+		report.WalletAmountAfter = data.Data.BalanceAfter
+		report.BetAmount = sumBetAmount
+		report.BetResult = float32(req.Amount)
+		report.BetWinloss = winLoss
+		report.Status = status
+		report.IP = utils.GetIP()
+		report.Description = ""
+		report.CreatedAt = time.Now()
+
+		// บันทึกข้อมูลรายงานลงฐานข้อมูล
+		if err := tx.Create(&report).Error; err != nil {
+			tx.Rollback() // ยกเลิก transaction หากเกิดข้อผิดพลาด
+			fmt.Println("Error saving report:", err)
+			return err
+		}
 	}
 
 	// ยืนยันการทำงานของ transaction (commit)
@@ -442,6 +452,14 @@ func RollbackProvider(c *fiber.Ctx) error {
 		})
 	}
 
+	// เริ่มต้น transaction
+	tx := database.DB.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
 	// ตั้งค่า amount ให้เป็นบวกสำหรับการเติมเงิน
 	amountSettle := float32(req.Amount)
 	fmt.Println("amountSettle =", amountSettle)
@@ -449,6 +467,7 @@ func RollbackProvider(c *fiber.Ctx) error {
 	// เรียกฟังก์ชัน settleServer เพื่อทำการเติมเงิน
 	data, err := settleServer(amountSettle, req.PlayerUsername)
 	if err != nil {
+		tx.Rollback() // ยกเลิก transaction หากเกิดข้อผิดพลาด
 		fmt.Println("Error retrieving balance:", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Failed to retrieve balance",
@@ -478,8 +497,64 @@ func RollbackProvider(c *fiber.Ctx) error {
 	tran.BuyFeature = eventDetail.IsFeatureBuy
 	tran.CreatedAt = time.Now()
 
-	if err := database.DB.Create(&tran).Error; err != nil {
+	// บันทึกธุรกรรมในตาราง GplayTransactions ภายใต้ transaction
+	if err := tx.Create(&tran).Error; err != nil {
+		tx.Rollback() // ยกเลิก transaction หากเกิดข้อผิดพลาด
 		fmt.Println("Error saving transaction:", err)
+		return err
+	}
+
+	// คำนวณยอดรวมของ Bet ใน round เดียวกันจากธุรกรรมที่เป็น credit
+	var sumAmount float32
+	if err := tx.Model(&models.GplayTransactions{}).
+		Where("status = ? AND round_id = ?", "debit", req.RoundId).
+		Select("COALESCE(SUM(bet_amount), 0)").Scan(&sumAmount).Error; err != nil {
+		tx.Rollback() // ยกเลิก transaction หากเกิดข้อผิดพลาด
+		fmt.Println("Error calculating sum:", err)
+		return err
+	}
+
+	// คำนวณยอดชนะ/แพ้ และสถานะ
+	var winLoss = float32(req.Amount) - sumAmount
+	var status = ""
+	if winLoss > 0 {
+		status = "WIN"
+	} else if winLoss == 0 {
+		status = "EQ"
+	} else {
+		status = "LOSS"
+	}
+	fmt.Println("sumAmount = ", sumAmount)
+	// เพิ่มรายการใน Reports ภายใต้ transaction
+	var report models.Reports
+	report.UserID = data.Data.UserID
+	report.Username = data.Data.Username
+	report.AgentID = data.Data.AgentID
+	report.RoundId = req.RoundId
+	report.ProductId = req.ProductName
+	report.ProductName = req.ProductName
+	report.GameId = req.GameCode
+	report.GameName = req.GameName
+	report.WalletAmountBefore = data.Data.BalanceBefore
+	report.WalletAmountAfter = data.Data.BalanceAfter
+	report.BetAmount = sumAmount
+	report.BetResult = float32(req.Amount)
+	report.BetWinloss = winLoss
+	report.Status = status
+	report.IP = utils.GetIP()
+	report.Description = ""
+	report.CreatedAt = time.Now()
+
+	// บันทึกข้อมูลรายงานลงฐานข้อมูล
+	if err := tx.Create(&report).Error; err != nil {
+		tx.Rollback() // ยกเลิก transaction หากเกิดข้อผิดพลาด
+		fmt.Println("Error saving report:", err)
+		return err
+	}
+
+	// ยืนยันการทำงานของ transaction (commit)
+	if err := tx.Commit().Error; err != nil {
+		fmt.Println("Error committing transaction:", err)
 		return err
 	}
 
