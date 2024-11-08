@@ -344,7 +344,7 @@ func CreditProvider(c *fiber.Ctx) error {
 
 		// คำนวณยอดรวมของ Bet ใน round เดียวกันจากธุรกรรมที่เป็น credit
 		parts := strings.Split(req.TxnId, "-")
-		fmt.Println(parts)
+		fmt.Println(parts[1])
 		var sumBetAmount, sumPayoutAmount float32
 		if err := tx.Model(&models.GplayTransactions{}).
 			Where("txn_id LIKE ?", "%"+parts[1]+"%").
