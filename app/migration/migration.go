@@ -13,6 +13,7 @@ func RunMigration() {
 	err := DB.Migrator().DropTable(
 		&models.Reports{},
 		&models.Pg100Transactions{},
+		&models.GplayTransactions{},
 	)
 
 	if err != nil {
@@ -23,7 +24,7 @@ func RunMigration() {
 	// Auto-migrate tables
 	err = DB.AutoMigrate(
 		&models.Reports{},
-		&models.Pg100Transactions{},
+		&models.GplayTransactions{},
 	)
 	if err != nil {
 		// Handle error

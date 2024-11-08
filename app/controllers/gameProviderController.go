@@ -24,20 +24,36 @@ type BalanceRequest struct {
 	Timestamp      int64  `json:"timestamp"`
 }
 
-type DebitRequest struct {
-	OperatorToken  string  `json:"operatorToken"`
-	SeamlessKey    string  `json:"seamlessKey"`
-	PlayerUsername string  `json:"playerUsername"`
-	CurrencyCode   string  `json:"currencyCode"`
-	ProductName    string  `json:"productName"`
-	ProductId      int     `json:"productId"`
-	ProductCode    string  `json:"productCode"`
-	EventType      int     `json:"eventType"`
-	EventName      string  `json:"eventName"`
-	Amount         float64 `json:"amount"`
-	RequestUid     string  `json:"requestUid"`
-	RequestTime    string  `json:"requestTime"`
-	Timestamp      string  `json:"timestamp"`
+type EventDetail struct {
+	IsFeature                    bool    `json:"isFeature"`
+	IsFeatureBuy                 bool    `json:"isFeatureBuy"`
+	JackpotRtpContributionAmount float64 `json:"jackpotRtpContributionAmount"`
+	JackpotWinAmount             float64 `json:"jackpotWinAmount"`
+}
+
+type TransactionRequest struct {
+	AgentUsername  string      `json:"agentUsername"`
+	Amount         float64     `json:"amount"`
+	CategoryId     int         `json:"categoryId"`
+	CategoryName   string      `json:"categoryName"`
+	CurrencyCode   string      `json:"currencyCode"`
+	EventDetail    EventDetail `json:"eventDetail"`
+	EventName      string      `json:"eventName"`
+	EventType      int         `json:"eventType"`
+	GameCode       int         `json:"gameCode"`
+	GameName       string      `json:"gameName"`
+	IsRefund       bool        `json:"isRefund"`
+	OperatorToken  string      `json:"operatorToken"`
+	PlayerUsername string      `json:"playerUsername"`
+	ProductCode    string      `json:"productCode"`
+	ProductId      int         `json:"productId"`
+	ProductName    string      `json:"productName"`
+	RequestTime    string      `json:"requestTime"`
+	RequestUid     string      `json:"requestUid"`
+	RoundId        string      `json:"roundId"`
+	SeamlessKey    string      `json:"seamlessKey"`
+	Timestamp      float64     `json:"timestamp"`
+	TxnId          string      `json:"txnId"`
 }
 
 type CreditRequest struct {
