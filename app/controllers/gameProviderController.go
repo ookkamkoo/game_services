@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/google/uuid"
 )
 
 type BalanceRequest struct {
@@ -167,51 +166,60 @@ func BalanceProvider(c *fiber.Ctx) error {
 
 func DebitProvider(c *fiber.Ctx) error {
 	// Parse JSON body into DebitRequest struct
-	var req DebitRequest
+	// var req DebitRequest
+	// if err := c.BodyParser(&req); err != nil {
+	// 	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+	// 		"code": -1,
+	// 		"msg":  "Invalid request format",
+	// 	})
+	// }
+
+	var req map[string]interface{}
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"code": -1,
 			"msg":  "Invalid request format",
 		})
 	}
+	fmt.Println(req)
 
-	// Example balance retrieval (replace this with actual balance logic)
-	currentBalance := 1000.0 // Example balance; replace with actual balance retrieval
-	responseTime := time.Now().Format("2006-01-02 15:04:05")
+	// // Example balance retrieval (replace this with actual balance logic)
+	// currentBalance := 1000.0 // Example balance; replace with actual balance retrieval
+	// responseTime := time.Now().Format("2006-01-02 15:04:05")
 
-	// Check if there’s sufficient balance
-	if currentBalance < req.Amount {
-		// Log insufficient balance
-		fmt.Println("Insufficient balance for debit request:", req.PlayerUsername)
+	// // Check if there’s sufficient balance
+	// if currentBalance < req.Amount {
+	// 	// Log insufficient balance
+	// 	fmt.Println("Insufficient balance for debit request:", req.PlayerUsername)
 
-		// Prepare and return the insufficient balance response
-		response := fiber.Map{
-			"code":         1006,
-			"msg":          "Insufficient balance",
-			"balance":      currentBalance,
-			"responseTime": responseTime,
-			"responseUid":  uuid.New().String(),
-		}
-		return utils.SuccessResponse(c, response, "error")
-	}
+	// 	// Prepare and return the insufficient balance response
+	// 	response := fiber.Map{
+	// 		"code":         1006,
+	// 		"msg":          "Insufficient balance",
+	// 		"balance":      currentBalance,
+	// 		"responseTime": responseTime,
+	// 		"responseUid":  uuid.New().String(),
+	// 	}
+	// 	return utils.SuccessResponse(c, response, "error")
+	// }
 
-	// Deduct the requested amount from balance
-	updatedBalance := currentBalance - req.Amount
+	// // Deduct the requested amount from balance
+	// updatedBalance := currentBalance - req.Amount
 
-	// Log successful debit transaction
-	fmt.Printf("Debit successful for %s, amount: %.2f, new balance: %.2f\n", req.PlayerUsername, req.Amount, updatedBalance)
+	// // Log successful debit transaction
+	// fmt.Printf("Debit successful for %s, amount: %.2f, new balance: %.2f\n", req.PlayerUsername, req.Amount, updatedBalance)
 
-	// Prepare the success response
-	response := fiber.Map{
-		"code":         0,
-		"msg":          "Debit successful",
-		"balance":      updatedBalance,
-		"responseTime": responseTime,
-		"responseUid":  uuid.New().String(),
-	}
+	// // Prepare the success response
+	// response := fiber.Map{
+	// 	"code":         0,
+	// 	"msg":          "Debit successful",
+	// 	"balance":      updatedBalance,
+	// 	"responseTime": responseTime,
+	// 	"responseUid":  uuid.New().String(),
+	// }
 
 	// Return the success response with the updated balance
-	return utils.SuccessResponse(c, response, "success")
+	return utils.SuccessResponse(c, "response", "success")
 }
 
 func CreditProvider(c *fiber.Ctx) error {
