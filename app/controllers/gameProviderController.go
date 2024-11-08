@@ -220,7 +220,7 @@ func DebitProvider(c *fiber.Ctx) error {
 	var sumAmount float32
 	if err := database.DB.Model(&models.GplayTransactions{}).
 		Where("status = ? AND round_id = ?", "credit", req.RoundId).
-		Select("COALESCE(SUM(amount), 0)").Scan(&sumAmount).Error; err != nil {
+		Select("COALESCE(SUM(bet_amount), 0)").Scan(&sumAmount).Error; err != nil {
 		fmt.Println("Error calculating sum:", err)
 		return err
 	}
