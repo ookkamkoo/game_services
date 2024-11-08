@@ -391,7 +391,7 @@ func CreditProvider(c *fiber.Ctx) error {
 	responseTime := time.Now().Format("2006-01-02 15:04:05")
 
 	// Log สำหรับการทำรายการเติมเงินสำเร็จ
-	fmt.Printf("Credit successful for %s, amount: %.2f, new balance: %.2f\n", req.PlayerUsername, req.Amount, data.Data.BalanceAfter)
+	// fmt.Printf("Credit successful for %s, amount: %.2f, new balance: %.2f\n", req.PlayerUsername, req.Amount, data.Data.BalanceAfter)
 
 	// สร้างข้อมูล response และส่งกลับ
 	response := fiber.Map{
