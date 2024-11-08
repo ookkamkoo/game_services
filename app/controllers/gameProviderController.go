@@ -283,33 +283,42 @@ func DebitProvider(c *fiber.Ctx) error {
 }
 
 func CreditProvider(c *fiber.Ctx) error {
-	// Parse JSON body into CreditRequest struct
-	var req CreditRequest
+	fmt.Println("=============== CreditProvider =================")
+	var req map[string]interface{}
 	if err := c.BodyParser(&req); err != nil {
+		fmt.Println("Invalid request format")
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"code": -1,
 			"msg":  "Invalid request format",
 		})
 	}
+	// Parse JSON body into CreditRequest struct
+	// var req CreditRequest
+	// if err := c.BodyParser(&req); err != nil {
+	// 	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+	// 		"code": -1,
+	// 		"msg":  "Invalid request format",
+	// 	})
+	// }
 
-	// Example balance retrieval and credit processing (replace with actual logic)
-	currentBalance := 1000.0 // Replace with actual balance retrieval logic
-	updatedBalance := currentBalance + req.Amount
+	// // Example balance retrieval and credit processing (replace with actual logic)
+	// currentBalance := 1000.0 // Replace with actual balance retrieval logic
+	// updatedBalance := currentBalance + req.Amount
 
-	// Log successful credit transaction
-	fmt.Printf("Credit successful for %s, amount: %.2f, new balance: %.2f\n", req.PlayerUsername, req.Amount, updatedBalance)
+	// // Log successful credit transaction
+	// fmt.Printf("Credit successful for %s, amount: %.2f, new balance: %.2f\n", req.PlayerUsername, req.Amount, updatedBalance)
 
-	// Prepare the response with the updated balance
-	response := fiber.Map{
-		"code":         0,
-		"msg":          "Credit successful",
-		"balance":      updatedBalance,
-		"responseTime": time.Now().Format("2006-01-02 15:04:05"),
-		"responseUid":  req.RequestUid,
-	}
+	// // Prepare the response with the updated balance
+	// response := fiber.Map{
+	// 	"code":         0,
+	// 	"msg":          "Credit successful",
+	// 	"balance":      updatedBalance,
+	// 	"responseTime": time.Now().Format("2006-01-02 15:04:05"),
+	// 	"responseUid":  req.RequestUid,
+	// }
 
 	// Return the success response with the updated balance
-	return utils.SuccessResponse(c, response, "success")
+	return c.JSON("response")
 }
 
 func RollbackProvider(c *fiber.Ctx) error {
