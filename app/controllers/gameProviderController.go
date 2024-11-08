@@ -338,7 +338,7 @@ func CreditProvider(c *fiber.Ctx) error {
 		var sumPayoutAmount float32
 		// var sum
 		if err := database.DB.Model(&models.GplayTransactions{}).
-			Select("COALESCE(SUM(bet_amount), 0) AS sum_bet_amount, COALESCE(SUM(payout_amount), 0) AS sum_payout_amount").
+			Select("COALESCE(SUM(bet_amount), 0) AS sum_bet_amount").
 			Scan(&sumPayoutAmount).Error; err != nil {
 			fmt.Println("Error calculating sum:", err)
 			return err
