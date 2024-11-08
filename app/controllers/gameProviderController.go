@@ -210,6 +210,7 @@ func DebitProvider(c *fiber.Ctx) error {
 		})
 	}
 	amountSettle := -float32(req.Amount)
+	fmt.Println("amountSettle = ?", amountSettle)
 	// // Example balance retrieval (replace this with actual balance logic)
 	data, err := settleServer(amountSettle, req.PlayerUsername)
 	if err != nil {
