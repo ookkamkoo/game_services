@@ -343,7 +343,7 @@ func CreditProvider(c *fiber.Ctx) error {
 		// var sumPayoutAmount float32
 		// var sum
 		if err := database.DB.Model(&models.GplayTransactions{}).
-			Where("txn_id LIKE ?", parts[1]).
+			Where("txn_id LIKE ?", "%"+parts[1]+"%").
 			Select("COALESCE(SUM(bet_amount), 0) AS sum_bet_amount, COALESCE(SUM(payout_amount), 0) AS sum_payout_amount").
 			Scan(&sumGplay).Error; err != nil {
 			fmt.Println("Error calculating sum:", err)
