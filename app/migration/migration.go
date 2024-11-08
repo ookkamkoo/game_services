@@ -24,6 +24,7 @@ func RunMigration() {
 	// Auto-migrate tables
 	err = DB.AutoMigrate(
 		&models.Reports{},
+		&models.Pg100Transactions{},
 		&models.GplayTransactions{},
 	)
 	if err != nil {
