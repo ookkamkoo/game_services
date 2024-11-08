@@ -344,7 +344,7 @@ func CreditProvider(c *fiber.Ctx) error {
 		// คำนวณยอดรวมของ Bet ใน round เดียวกันจากธุรกรรมที่เป็น credit
 		var sumBetAmount, sumPayoutAmount float32
 		if err := tx.Model(&models.GplayTransactions{}).
-			Where("round_id = ?", req.RoundId).
+			Where(" txn_id LIKE ?", "%"+req.RoundId+"%").
 			Select("COALESCE(SUM(bet_amount), 0) AS sum_bet_amount, COALESCE(SUM(payout_amount), 0) AS sum_payout_amount").
 			Scan(&struct {
 				SumBetAmount    *float32 `json:"sum_bet_amount"`
