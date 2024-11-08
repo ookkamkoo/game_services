@@ -238,10 +238,111 @@ func DebitProvider(c *fiber.Ctx) error {
 		return err
 	}
 
+	// ยืนยันการทำงานของ transaction (commit)
+	if err := tx.Commit().Error; err != nil {
+		fmt.Println("Error committing transaction:", err)
+		return err
+	}
+
+	// ส่งข้อมูลตอบกลับ
+	responseTime := time.Now().Format("2006-01-02 15:04:05")
+	response := fiber.Map{
+		"code":         0,
+		"msg":          "Debit successful",
+		"balance":      data.Data.BalanceAfter,
+		"responseTime": responseTime,
+		"responseUid":  uuid.New().String(),
+	}
+
+	fmt.Println("Response:", response)
+
+	return c.JSON(response)
+}
+
+func CreditProvider(c *fiber.Ctx) error {
+	fmt.Println("=============== CreditProvider =================")
+
+	// อ่านและพิมพ์ body สำหรับตรวจสอบ
+	body := c.Body()
+	fmt.Println("Raw Body:", string(body))
+
+	// พาร์ส JSON body เป็น struct DebitCreditRequest
+	var req DebitCreditRequest
+	if err := c.BodyParser(&req); err != nil {
+		fmt.Println("Invalid request format")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"code": -1,
+			"msg":  "Invalid request format",
+		})
+	}
+	fmt.Println("Parsed Request:", req)
+
+	// พาร์ส JSON string ของ EventDetail เป็น struct EventDetail
+	var eventDetail EventDetail
+	if err := json.Unmarshal([]byte(req.EventDetail), &eventDetail); err != nil {
+		fmt.Println("Error parsing EventDetail:", err)
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"code": -1,
+			"msg":  "Invalid event detail format",
+		})
+	}
+
+	// เริ่มต้น transaction
+	tx := database.DB.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// ตั้งค่า amount ให้เป็นบวกสำหรับการเติมเงิน
+	amountSettle := float32(req.Amount)
+	fmt.Println("amountSettle =", amountSettle)
+
+	// เรียกฟังก์ชัน settleServer เพื่อทำการเติมเงิน
+	data, err := settleServer(amountSettle, req.PlayerUsername)
+	if err != nil {
+		tx.Rollback() // ยกเลิก transaction หากเกิดข้อผิดพลาด
+		fmt.Println("Error retrieving balance:", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to retrieve balance",
+		})
+	}
+
+	// เพิ่มรายการธุรกรรมใหม่ใน GplayTransactions
+	var tran models.GplayTransactions
+	tran.UserID = data.Data.UserID
+	tran.AgentID = data.Data.AgentID
+	tran.Username = data.Data.Username
+	tran.CategoryId = req.GameCode
+	tran.CategoryName = req.CategoryName
+	tran.ProductId = req.ProductName
+	tran.ProductCode = req.ProductCode
+	tran.WalletAmountBefore = data.Data.BalanceBefore
+	tran.WalletAmountAfter = data.Data.BalanceAfter
+	tran.BetAmount = 0                      // เพราะเป็นการเติมเงิน ไม่ใช่การเดิมพัน
+	tran.PayoutAmount = float32(req.Amount) // จำนวนเงินที่เติมเข้าระบบ
+	tran.RoundId = req.RoundId
+	tran.TxnId = req.TxnId
+	tran.Status = req.EventName
+	tran.GameCode = req.GameCode
+	tran.PlayInfo = req.GameName
+	tran.IsEndRound = eventDetail.IsEndRound
+	tran.IsFreeSpin = eventDetail.IsFeature
+	tran.BuyFeature = eventDetail.IsFeatureBuy
+	tran.CreatedAt = time.Now()
+
+	// บันทึกธุรกรรมในตาราง GplayTransactions ภายใต้ transaction
+	if err := tx.Create(&tran).Error; err != nil {
+		tx.Rollback() // ยกเลิก transaction หากเกิดข้อผิดพลาด
+		fmt.Println("Error saving transaction:", err)
+		return err
+	}
+
 	// คำนวณยอดรวมของ Bet ใน round เดียวกันจากธุรกรรมที่เป็น credit
 	var sumAmount float32
 	if err := tx.Model(&models.GplayTransactions{}).
-		Where("status = ? AND round_id = ?", "credit", req.RoundId).
+		Where("status = ? AND round_id = ?", "debit", req.RoundId).
 		Select("COALESCE(SUM(bet_amount), 0)").Scan(&sumAmount).Error; err != nil {
 		tx.Rollback() // ยกเลิก transaction หากเกิดข้อผิดพลาด
 		fmt.Println("Error calculating sum:", err)
@@ -258,7 +359,7 @@ func DebitProvider(c *fiber.Ctx) error {
 	} else {
 		status = "LOSS"
 	}
-
+	fmt.Println("sumAmount = ", sumAmount)
 	// เพิ่มรายการใน Reports ภายใต้ transaction
 	var report models.Reports
 	report.UserID = data.Data.UserID
@@ -292,11 +393,16 @@ func DebitProvider(c *fiber.Ctx) error {
 		return err
 	}
 
-	// ส่งข้อมูลตอบกลับ
+	// สร้าง response เวลาปัจจุบัน
 	responseTime := time.Now().Format("2006-01-02 15:04:05")
+
+	// Log สำหรับการทำรายการเติมเงินสำเร็จ
+	fmt.Printf("Credit successful for %s, amount: %.2f, new balance: %.2f\n", req.PlayerUsername, req.Amount, data.Data.BalanceAfter)
+
+	// สร้างข้อมูล response และส่งกลับ
 	response := fiber.Map{
 		"code":         0,
-		"msg":          "Debit successful",
+		"msg":          "Credit successful",
 		"balance":      data.Data.BalanceAfter,
 		"responseTime": responseTime,
 		"responseUid":  uuid.New().String(),
@@ -304,11 +410,12 @@ func DebitProvider(c *fiber.Ctx) error {
 
 	fmt.Println("Response:", response)
 
+	// ส่ง response กลับในรูปแบบ JSON
 	return c.JSON(response)
 }
 
-func CreditProvider(c *fiber.Ctx) error {
-	fmt.Println("=============== CreditProvider =================")
+func RollbackProvider(c *fiber.Ctx) error {
+	fmt.Println("=============== RollbackProvider =================")
 
 	// อ่านและพิมพ์ body สำหรับตรวจสอบ
 	body := c.Body()
@@ -395,36 +502,6 @@ func CreditProvider(c *fiber.Ctx) error {
 
 	// ส่ง response กลับในรูปแบบ JSON
 	return c.JSON(response)
-}
-
-func RollbackProvider(c *fiber.Ctx) error {
-	// Parse JSON body into RollbackRequest struct
-	var req RollbackRequest
-	if err := c.BodyParser(&req); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"code": -1,
-			"msg":  "Invalid request format",
-		})
-	}
-
-	// Example balance retrieval and rollback processing (replace with actual logic)
-	currentBalance := 1000.0                      // Replace with actual balance retrieval logic
-	updatedBalance := currentBalance + req.Amount // Rollback typically reverses the original amount
-
-	// Log successful rollback transaction
-	fmt.Printf("Rollback successful for %s, amount: %.2f, new balance: %.2f\n", req.PlayerUsername, req.Amount, updatedBalance)
-
-	// Prepare the response with the updated balance
-	response := fiber.Map{
-		"code":         0,
-		"msg":          "Rollback successful",
-		"balance":      updatedBalance,
-		"responseTime": time.Now().Format("2006-01-02 15:04:05"),
-		"responseUid":  req.RequestUid,
-	}
-
-	// Return the success response with the updated balance
-	return utils.SuccessResponse(c, response, "success")
 }
 
 func RewardProvider(c *fiber.Ctx) error {
