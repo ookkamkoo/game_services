@@ -35,7 +35,7 @@ type EventDetail struct {
 	JackpotWinAmount             float64 `json:"jackpotWinAmount"`
 }
 
-type DebitRequest struct {
+type DebitCreditRequest struct {
 	OperatorToken  string  `json:"operatorToken"`
 	SeamlessKey    string  `json:"seamlessKey"`
 	AgentUsername  string  `json:"agentUsername"`
@@ -58,34 +58,6 @@ type DebitRequest struct {
 	RequestTime    string  `json:"requestTime"`
 	Timestamp      int64   `json:"timestamp"` // Use int64 for Unix timestamps
 	IsRefund       bool    `json:"isRefund"`
-}
-
-type CreditRequest struct {
-	OperatorToken  string  `json:"operatorToken"`
-	SeamlessKey    string  `json:"seamlessKey"`
-	AgentUsername  string  `json:"agentUsername"`
-	PlayerUsername string  `json:"playerUsername"`
-	CurrencyCode   string  `json:"currencyCode"`
-	ProductName    string  `json:"productName"`
-	ProductId      int     `json:"productId"`
-	ProductCode    string  `json:"productCode"`
-	CategoryId     int     `json:"categoryId"`
-	CategoryName   string  `json:"categoryName"`
-	GameName       string  `json:"gameName"`
-	GameCode       string  `json:"gameCode"`
-	TxnId          string  `json:"txnId"`
-	RoundId        string  `json:"roundId"`
-	EventType      int     `json:"eventType"`
-	EventName      string  `json:"eventName"`
-	TxnStatus      string  `json:"txnStatus"`
-	TxnRemark      string  `json:"txnRemark"`
-	ResultInfo     string  `json:"resultInfo"`
-	Amount         float64 `json:"amount"`
-	Turnover       float64 `json:"turnover"`
-	IsEndRound     bool    `json:"isEndRound"`
-	RequestUid     string  `json:"requestUid"`
-	RequestTime    string  `json:"requestTime"`
-	Timestamp      string  `json:"timestamp"`
 }
 
 type RollbackRequest struct {
@@ -191,7 +163,7 @@ func DebitProvider(c *fiber.Ctx) error {
 	// body := c.Body()
 	// fmt.Println("Raw Body:", string(body))
 
-	var req DebitRequest
+	var req DebitCreditRequest
 	if err := c.BodyParser(&req); err != nil {
 		fmt.Println("Invalid request format")
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -289,7 +261,7 @@ func CreditProvider(c *fiber.Ctx) error {
 	// body := c.Body()
 	// fmt.Println("Raw Body:", string(body))
 
-	var req DebitRequest
+	var req DebitCreditRequest
 	if err := c.BodyParser(&req); err != nil {
 		fmt.Println("Invalid request format")
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -335,7 +307,7 @@ func CreditProvider(c *fiber.Ctx) error {
 	tran.Status = req.EventName
 	tran.GameCode = req.GameCode
 	tran.PlayInfo = req.GameName
-	tran.IsEndRound = false
+	tran.IsEndRound = true
 	tran.IsFreeSpin = eventDetail.IsFeature
 	tran.BuyFeature = eventDetail.IsFeatureBuy
 	tran.CreatedAt = time.Now()
