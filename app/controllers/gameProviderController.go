@@ -248,7 +248,7 @@ func DebitProvider(c *fiber.Ctx) error {
 		return err
 	}
 
-	currentBalance, err := getBalanceServer(req.PlayerUsername)
+	// currentBalance, err := getBalanceServer(req.PlayerUsername)
 	responseTime := time.Now().Format("2006-01-02 15:04:05")
 	if err != nil {
 		response := fiber.Map{
@@ -261,34 +261,17 @@ func DebitProvider(c *fiber.Ctx) error {
 		fmt.Println(response)
 		return c.JSON(response)
 	}
-
-	if currentBalance.Data.Balance < float32(req.Amount) {
-		// Log insufficient balance
-		fmt.Println("Insufficient balance for debit request:", req.PlayerUsername)
-
-		// Prepare and return the insufficient balance response
-		response := fiber.Map{
-			"code":         1006,
-			"msg":          "Insufficient balance",
-			"balance":      currentBalance.Data.Balance,
-			"responseTime": responseTime,
-			"responseUid":  uuid.New().String(),
-		}
-		fmt.Println(response)
-		return c.JSON(response)
-	}
-	fmt.Println("update")
-	// Deduct the requested amount from balance
-	updatedBalance := currentBalance.Data.Balance - float32(req.Amount)
+	// Log insufficient balance
+	fmt.Println("Insufficient balance for debit request:", req.PlayerUsername)
 
 	// Log successful debit transaction
-	fmt.Printf("Debit successful for %s, amount: %.2f, new balance: %.2f\n", req.PlayerUsername, req.Amount, updatedBalance)
+	fmt.Printf("Debit successful for %s, amount: %.2f, new balance: %.2f\n", req.PlayerUsername, req.Amount, data.Data.BalanceAfter)
 
 	// Prepare the success response
 	response := fiber.Map{
 		"code":         0,
 		"msg":          "Debit successful",
-		"balance":      updatedBalance,
+		"balance":      data.Data.BalanceAfter,
 		"responseTime": responseTime,
 		"responseUid":  uuid.New().String(),
 	}
