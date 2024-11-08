@@ -368,6 +368,7 @@ func CreditProvider(c *fiber.Ctx) error {
 		report.Username = data.Data.Username
 		report.AgentID = data.Data.AgentID
 		report.RoundId = req.RoundId
+		report.RoundCheck = parts[1]
 		report.ProductId = req.ProductName
 		report.ProductName = req.ProductName
 		report.GameId = req.GameCode
