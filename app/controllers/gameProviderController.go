@@ -2,14 +2,10 @@ package controllers
 
 import (
 	"fmt"
-	"game_services/app/database"
-	"game_services/app/models"
 	"game_services/app/utils"
-	"strconv"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/google/uuid"
 )
 
 type BalanceRequest struct {
@@ -187,101 +183,105 @@ func BalanceProvider(c *fiber.Ctx) error {
 func DebitProvider(c *fiber.Ctx) error {
 	fmt.Println("=============== DebitProvider =================")
 	// Parse JSON body into DebitRequest struct
-	var req TransactionRequest
-	if err := c.BodyParser(&req); err != nil {
-		fmt.Println("Invalid request format")
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"code": -1,
-			"msg":  "Invalid request format",
-		})
-	}
 
-	// // Example balance retrieval (replace this with actual balance logic)
-	data, err := settleServer(0, -float32(req.Amount), req.PlayerUsername)
-	if err != nil {
-		fmt.Println("Error retrieving balance:", err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Failed to retrieve balance",
-		})
-	}
+	body := c.Body()
+	fmt.Println("Raw Body:", string(body))
 
-	var tran models.GplayTransactions
-	tran.UserID = data.Data.UserID
-	tran.AgentID = data.Data.AgentID
-	tran.Username = data.Data.Username
-	tran.CategoryId = strconv.Itoa(req.GameCode)
-	tran.CategoryName = req.CategoryName
-	tran.ProductId = req.ProductName
-	tran.ProductCode = req.ProductCode
-	tran.WalletAmountBefore = data.Data.BalanceBefore
-	tran.WalletAmountAfter = data.Data.BalanceAfter
-	tran.BetAmount = float32(req.Amount)
-	tran.PayoutAmount = 0
-	tran.RoundId = req.RoundId
-	tran.TxnId = req.TxnId
-	tran.Status = req.EventName
-	tran.GameCode = strconv.Itoa(req.GameCode)
-	tran.PlayInfo = req.GameName
-	tran.IsEndRound = false
-	tran.IsFreeSpin = req.EventDetail.IsFeature
-	tran.BuyFeature = req.EventDetail.IsFeatureBuy
-	tran.CreatedAt = time.Now()
+	// var req TransactionRequest
+	// if err := c.BodyParser(&req); err != nil {
+	// 	fmt.Println("Invalid request format")
+	// 	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+	// 		"code": -1,
+	// 		"msg":  "Invalid request format",
+	// 	})
+	// }
 
-	if err := database.DB.Create(&tran).Error; err != nil {
-		fmt.Println("pg100")
-		fmt.Println(err)
-		return err
-	}
+	// // // Example balance retrieval (replace this with actual balance logic)
+	// data, err := settleServer(0, -float32(req.Amount), req.PlayerUsername)
+	// if err != nil {
+	// 	fmt.Println("Error retrieving balance:", err)
+	// 	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+	// 		"error": "Failed to retrieve balance",
+	// 	})
+	// }
 
-	currentBalance, err := getBalanceServer(req.PlayerUsername)
-	responseTime := time.Now().Format("2006-01-02 15:04:05")
-	if err != nil {
-		response := fiber.Map{
-			"code":         1006,
-			"msg":          "Insufficient balance",
-			"balance":      0,
-			"responseTime": responseTime,
-			"responseUid":  uuid.New().String(),
-		}
-		fmt.Println(response)
-		return c.JSON(response)
-	}
+	// var tran models.GplayTransactions
+	// tran.UserID = data.Data.UserID
+	// tran.AgentID = data.Data.AgentID
+	// tran.Username = data.Data.Username
+	// tran.CategoryId = strconv.Itoa(req.GameCode)
+	// tran.CategoryName = req.CategoryName
+	// tran.ProductId = req.ProductName
+	// tran.ProductCode = req.ProductCode
+	// tran.WalletAmountBefore = data.Data.BalanceBefore
+	// tran.WalletAmountAfter = data.Data.BalanceAfter
+	// tran.BetAmount = float32(req.Amount)
+	// tran.PayoutAmount = 0
+	// tran.RoundId = req.RoundId
+	// tran.TxnId = req.TxnId
+	// tran.Status = req.EventName
+	// tran.GameCode = strconv.Itoa(req.GameCode)
+	// tran.PlayInfo = req.GameName
+	// tran.IsEndRound = false
+	// tran.IsFreeSpin = req.EventDetail.IsFeature
+	// tran.BuyFeature = req.EventDetail.IsFeatureBuy
+	// tran.CreatedAt = time.Now()
 
-	if currentBalance.Data.Balance < float32(req.Amount) {
-		// Log insufficient balance
-		fmt.Println("Insufficient balance for debit request:", req.PlayerUsername)
+	// if err := database.DB.Create(&tran).Error; err != nil {
+	// 	fmt.Println("pg100")
+	// 	fmt.Println(err)
+	// 	return err
+	// }
 
-		// Prepare and return the insufficient balance response
-		response := fiber.Map{
-			"code":         1006,
-			"msg":          "Insufficient balance",
-			"balance":      currentBalance.Data.Balance,
-			"responseTime": responseTime,
-			"responseUid":  uuid.New().String(),
-		}
-		fmt.Println(response)
-		return c.JSON(response)
-	}
-	fmt.Println("update")
-	// Deduct the requested amount from balance
-	updatedBalance := currentBalance.Data.Balance - float32(req.Amount)
+	// currentBalance, err := getBalanceServer(req.PlayerUsername)
+	// responseTime := time.Now().Format("2006-01-02 15:04:05")
+	// if err != nil {
+	// 	response := fiber.Map{
+	// 		"code":         1006,
+	// 		"msg":          "Insufficient balance",
+	// 		"balance":      0,
+	// 		"responseTime": responseTime,
+	// 		"responseUid":  uuid.New().String(),
+	// 	}
+	// 	fmt.Println(response)
+	// 	return c.JSON(response)
+	// }
 
-	// Log successful debit transaction
-	fmt.Printf("Debit successful for %s, amount: %.2f, new balance: %.2f\n", req.PlayerUsername, req.Amount, updatedBalance)
+	// if currentBalance.Data.Balance < float32(req.Amount) {
+	// 	// Log insufficient balance
+	// 	fmt.Println("Insufficient balance for debit request:", req.PlayerUsername)
 
-	// Prepare the success response
-	response := fiber.Map{
-		"code":         0,
-		"msg":          "Debit successful",
-		"balance":      updatedBalance,
-		"responseTime": responseTime,
-		"responseUid":  uuid.New().String(),
-	}
+	// 	// Prepare and return the insufficient balance response
+	// 	response := fiber.Map{
+	// 		"code":         1006,
+	// 		"msg":          "Insufficient balance",
+	// 		"balance":      currentBalance.Data.Balance,
+	// 		"responseTime": responseTime,
+	// 		"responseUid":  uuid.New().String(),
+	// 	}
+	// 	fmt.Println(response)
+	// 	return c.JSON(response)
+	// }
+	// fmt.Println("update")
+	// // Deduct the requested amount from balance
+	// updatedBalance := currentBalance.Data.Balance - float32(req.Amount)
 
-	fmt.Println(response)
+	// // Log successful debit transaction
+	// fmt.Printf("Debit successful for %s, amount: %.2f, new balance: %.2f\n", req.PlayerUsername, req.Amount, updatedBalance)
 
-	// Return the success response with the updated balance
-	return c.JSON(response)
+	// // Prepare the success response
+	// response := fiber.Map{
+	// 	"code":         0,
+	// 	"msg":          "Debit successful",
+	// 	"balance":      updatedBalance,
+	// 	"responseTime": responseTime,
+	// 	"responseUid":  uuid.New().String(),
+	// }
+
+	// fmt.Println(response)
+
+	// // Return the success response with the updated balance
+	return c.JSON("response")
 }
 
 func CreditProvider(c *fiber.Ctx) error {
