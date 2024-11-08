@@ -351,7 +351,7 @@ func CreditProvider(c *fiber.Ctx) error {
 		}
 
 		// คำนวณยอดชนะ/แพ้ และสถานะ
-		var winLoss = sumGplay.SumBetAmount - sumGplay.SumPayoutAmount
+		var winLoss = sumGplay.SumPayoutAmount - sumGplay.SumBetAmount
 		var status = ""
 		if winLoss > 0 {
 			status = "WIN"
