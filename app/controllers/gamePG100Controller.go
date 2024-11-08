@@ -244,6 +244,7 @@ func settleServer(payoutAmount float32, betAmount float32, username string) (mod
 	apiKeyBankend := os.Getenv("apiKeyBankend")
 	urlBankend := os.Getenv("urlBankend")
 	url := fmt.Sprintf("%s/settleGame", urlBankend)
+	fmt.Println("betAmount = ", betAmount)
 	fmt.Println("amount = ", payoutAmount-betAmount)
 	reqBody, err := json.Marshal(map[string]interface{}{
 		"username":  username,
