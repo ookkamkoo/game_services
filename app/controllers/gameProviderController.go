@@ -288,14 +288,6 @@ func CreditProvider(c *fiber.Ctx) error {
 		})
 	}
 
-	// เริ่มต้น transaction
-	tx := database.DB.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
-
 	// ตั้งค่า amount ให้เป็นบวกสำหรับการเติมเงิน
 	amountSettle := float32(req.Amount)
 	fmt.Println("amountSettle =", amountSettle)
@@ -303,7 +295,6 @@ func CreditProvider(c *fiber.Ctx) error {
 	// เรียกฟังก์ชัน settleServer เพื่อทำการเติมเงิน
 	data, err := settleServer(amountSettle, req.PlayerUsername)
 	if err != nil {
-		tx.Rollback() // ยกเลิก transaction หากเกิดข้อผิดพลาด
 		fmt.Println("Error retrieving balance:", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Failed to retrieve balance",
@@ -334,8 +325,7 @@ func CreditProvider(c *fiber.Ctx) error {
 	tran.CreatedAt = time.Now()
 
 	// บันทึกธุรกรรมในตาราง GplayTransactions ภายใต้ transaction
-	if err := tx.Create(&tran).Error; err != nil {
-		tx.Rollback() // ยกเลิก transaction หากเกิดข้อผิดพลาด
+	if err := database.DB.Create(&tran).Error; err != nil {
 		fmt.Println("Error saving transaction:", err)
 		return err
 	}
@@ -346,7 +336,7 @@ func CreditProvider(c *fiber.Ctx) error {
 		parts := strings.Split(req.TxnId, "-")
 		fmt.Println(parts[1])
 		var sumBetAmount, sumPayoutAmount float32
-		if err := tx.Model(&models.GplayTransactions{}).
+		if err := database.DB.Model(&models.GplayTransactions{}).
 			Select("COALESCE(SUM(bet_amount), 0) AS sum_bet_amount, COALESCE(SUM(payout_amount), 0) AS sum_payout_amount").
 			Scan(&struct {
 				SumBetAmount    *float32 `json:"sum_bet_amount"`
@@ -355,7 +345,6 @@ func CreditProvider(c *fiber.Ctx) error {
 				&sumBetAmount,
 				&sumPayoutAmount,
 			}).Error; err != nil {
-			tx.Rollback()
 			fmt.Println("Error calculating sum:", err)
 			return err
 		}
@@ -392,17 +381,10 @@ func CreditProvider(c *fiber.Ctx) error {
 		report.CreatedAt = time.Now()
 
 		// บันทึกข้อมูลรายงานลงฐานข้อมูล
-		if err := tx.Create(&report).Error; err != nil {
-			tx.Rollback() // ยกเลิก transaction หากเกิดข้อผิดพลาด
+		if err := database.DB.Create(&report).Error; err != nil {
 			fmt.Println("Error saving report:", err)
 			return err
 		}
-	}
-
-	// ยืนยันการทำงานของ transaction (commit)
-	if err := tx.Commit().Error; err != nil {
-		fmt.Println("Error committing transaction:", err)
-		return err
 	}
 
 	// สร้าง response เวลาปัจจุบัน
