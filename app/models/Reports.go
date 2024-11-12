@@ -27,6 +27,7 @@ type Reports struct {
 	UserID             uint      `json:"user_id" gorm:"type:int2;index;not null"`
 	AgentID            uint      `json:"agent_id" gorm:"type:int2;index;not null"`
 	Username           string    `json:"username" gorm:"type:varchar(50);index;not null"`
+	CategoryName       string    `json:"category_name" gorm:"type:varchar(50);index;not null"`
 	RoundId            string    `json:"round_id" gorm:"type:varchar(50);not null"`
 	RoundCheck         string    `json:"round_check" gorm:"type:varchar(50);not null"`
 	ProductId          string    `json:"product_id" gorm:"type:varchar(50);index;not null"`

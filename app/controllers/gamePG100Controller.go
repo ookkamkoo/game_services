@@ -171,6 +171,7 @@ func SettleBetsPG(c *fiber.Ctx) error {
 	report.UserID = data.Data.UserID
 	report.Username = data.Data.Username
 	report.AgentID = data.Data.AgentID
+	report.CategoryName = "Slot Game"
 	report.RoundId = body.Transactions[0].RoundID
 	report.RoundCheck = body.Transactions[0].RoundID
 	report.ProductId = body.ProductId
