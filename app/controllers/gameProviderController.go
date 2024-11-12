@@ -193,6 +193,8 @@ func DebitProvider(c *fiber.Ctx) error {
 			})
 		}
 	} else {
+		eventDetail.IsFeature = false
+		eventDetail.IsFeatureBuy = false
 		fmt.Println("EventDetail เป็นค่าว่าง ข้ามการพาร์ส")
 	}
 
