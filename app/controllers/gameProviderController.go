@@ -376,6 +376,7 @@ func CreditProvider(c *fiber.Ctx) error {
 		var report models.Reports
 		report.UserID = data.Data.UserID
 		report.Username = data.Data.Username
+		report.KeyDeposit = data.Data.KeyDeposit
 		report.CategoryName = req.CategoryName
 		report.AgentID = data.Data.AgentID
 		report.RoundId = req.RoundId
@@ -527,6 +528,7 @@ func RollbackProvider(c *fiber.Ctx) error {
 		var report models.Reports
 		report.UserID = data.Data.UserID
 		report.Username = data.Data.Username
+		report.KeyDeposit = data.Data.KeyDeposit
 		report.CategoryName = req.CategoryName
 		report.AgentID = data.Data.AgentID
 		report.RoundId = req.RoundId
@@ -678,6 +680,7 @@ func RewardProvider(c *fiber.Ctx) error {
 		var report models.Reports
 		report.UserID = data.Data.UserID
 		report.Username = data.Data.Username
+		report.KeyDeposit = data.Data.KeyDeposit
 		report.CategoryName = req.CategoryName
 		report.AgentID = data.Data.AgentID
 		report.RoundId = req.RoundId

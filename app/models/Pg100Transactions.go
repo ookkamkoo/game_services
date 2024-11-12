@@ -28,6 +28,7 @@ type SettleCheckResponseFormBackend struct {
 	Status        string  `json:"status"`
 	UserID        uint    `json:"user_id"`
 	AgentID       uint    `json:"agent_id"`
+	KeyDeposit    string  `json:"key_deposit"`
 	Username      string  `json:"username"`
 	UsernameAgent string  `json:"username_agent"`
 	BalanceBefore float32 `json:"amount_before"`

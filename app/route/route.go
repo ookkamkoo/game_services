@@ -40,6 +40,7 @@ func SetRoute(app *fiber.App) {
 	api.Post("/getReportGame", middlewares.GameSeviceMiddleware(), controllers.GetReportGame)
 	api.Get("/getReportGameProduct", middlewares.GameSeviceMiddleware(), controllers.GetReportGameProduct)
 	api.Get("/getReportGameByProductName", middlewares.GameSeviceMiddleware(), controllers.GetReportGameByProductName)
+	api.Post("/getReportGameByCategory", middlewares.GameSeviceMiddleware(), controllers.GetReportGameByCategoryName)
 	// api.Get("/user-information/:username", controllers.UserInformation)
 
 	// Gplay call back
