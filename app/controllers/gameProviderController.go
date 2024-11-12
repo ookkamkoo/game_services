@@ -527,6 +527,7 @@ func RollbackProvider(c *fiber.Ctx) error {
 		var report models.Reports
 		report.UserID = data.Data.UserID
 		report.Username = data.Data.Username
+		report.CategoryName = req.CategoryName
 		report.AgentID = data.Data.AgentID
 		report.RoundId = req.RoundId
 		report.RoundCheck = parts[1]
@@ -677,6 +678,7 @@ func RewardProvider(c *fiber.Ctx) error {
 		var report models.Reports
 		report.UserID = data.Data.UserID
 		report.Username = data.Data.Username
+		report.CategoryName = req.CategoryName
 		report.AgentID = data.Data.AgentID
 		report.RoundId = req.RoundId
 		report.RoundCheck = parts[1]
