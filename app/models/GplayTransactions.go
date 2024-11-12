@@ -14,6 +14,7 @@ type GplayTransactions struct {
 	UserID             uint      `json:"user_id" gorm:"type:int2;index;not null"`
 	AgentID            uint      `json:"agent_id" gorm:"type:int2;index;not null"`
 	Username           string    `json:"username" gorm:"type:varchar(50);index;not null"`
+	KeyDeposit         string    `json:"key_deposit" gorm:"type:varchar(50);unique;not null"`
 	CategoryId         string    `json:"category_id" gorm:"type:varchar(50);index;not null"`
 	CategoryName       string    `json:"category_name" gorm:"type:varchar(50);index;not null"`
 	ProductId          string    `json:"product_id" gorm:"type:varchar(50);index;not null"`

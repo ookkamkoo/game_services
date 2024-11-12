@@ -142,6 +142,7 @@ func SettleBetsPG(c *fiber.Ctx) error {
 	var pg100 models.Pg100Transactions
 	pg100.UserID = data.Data.UserID
 	pg100.Username = data.Data.Username
+	pg100.KeyDeposit = data.Data.KeyDeposit
 	pg100.AgentID = data.Data.AgentID
 	pg100.ProductId = body.ProductId
 	pg100.WalletAmountBefore = data.Data.BalanceBefore

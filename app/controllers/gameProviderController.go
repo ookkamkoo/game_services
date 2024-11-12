@@ -225,6 +225,7 @@ func DebitProvider(c *fiber.Ctx) error {
 	tran.UserID = data.Data.UserID
 	tran.AgentID = data.Data.AgentID
 	tran.Username = data.Data.Username
+	tran.KeyDeposit = data.Data.KeyDeposit
 	tran.CategoryId = req.GameCode
 	tran.CategoryName = req.CategoryName
 	tran.ProductId = req.ProductName
@@ -321,6 +322,7 @@ func CreditProvider(c *fiber.Ctx) error {
 	tran.UserID = data.Data.UserID
 	tran.AgentID = data.Data.AgentID
 	tran.Username = data.Data.Username
+	tran.KeyDeposit = data.Data.KeyDeposit
 	tran.CategoryId = req.GameCode
 	tran.CategoryName = req.CategoryName
 	tran.ProductId = req.ProductName
@@ -473,6 +475,7 @@ func RollbackProvider(c *fiber.Ctx) error {
 	tran.UserID = data.Data.UserID
 	tran.AgentID = data.Data.AgentID
 	tran.Username = data.Data.Username
+	tran.KeyDeposit = data.Data.KeyDeposit
 	tran.CategoryId = req.GameCode
 	tran.CategoryName = req.CategoryName
 	tran.ProductId = req.ProductName
@@ -625,6 +628,7 @@ func RewardProvider(c *fiber.Ctx) error {
 	tran.UserID = data.Data.UserID
 	tran.AgentID = data.Data.AgentID
 	tran.Username = data.Data.Username
+	tran.KeyDeposit = data.Data.KeyDeposit
 	tran.CategoryId = req.GameCode
 	tran.CategoryName = req.CategoryName
 	tran.ProductId = req.ProductName
