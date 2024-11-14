@@ -5,6 +5,7 @@ import (
 	"game_services/app/database"
 	"game_services/app/models"
 	"game_services/app/utils"
+	"math"
 	"net/http"
 	"time"
 
@@ -141,8 +142,8 @@ func GetReportGameProduct(c *fiber.Ctx) error {
 
 	// Struct for holding the sums grouped by product_id
 	type SumResult struct {
-		ProductName string  `json:"product_name"` // เปลี่ยนเป็น string
-		WinLose     float64 `json:"win_lose"`
+		CategoryName string  `json:"category_name"` // เปลี่ยนเป็น string
+		WinLose      float64 `json:"win_lose"`
 	}
 
 	var sums []SumResult
@@ -160,9 +161,9 @@ func GetReportGameProduct(c *fiber.Ctx) error {
 
 	// Perform the query with GROUP BY product_id
 	if err := database.DB.Model(&models.Reports{}).
-		Select("product_name, SUM(bet_winloss) AS win_lose").
+		Select("category_name, SUM(bet_winloss) AS win_lose").
 		Where("created_at BETWEEN ? AND ?", yesterdayStartFormatted, yesterdayEndFormatted).
-		Group("product_name").
+		Group("category_name").
 		Scan(&sums).Error; err != nil {
 		return utils.ErrorResponse(c, http.StatusBadRequest, "Failed to calculate sums.", err.Error())
 	}
@@ -227,22 +228,42 @@ func GetReportGameByProductName(c *fiber.Ctx) error {
 	return utils.SuccessResponse(c, response, "Get report game successfully.")
 }
 
-func GetReportGameByCategoryName(c *fiber.Ctx) error {
+func GetReportGameByCategorySum(c *fiber.Ctx) error {
 
 	// Struct for holding the sums grouped by product_name
 	type SumResult struct {
-		ProductName string  `json:"category_name"`
-		WinLose     float64 `json:"win_lose"`
+		CategoryName string  `json:"category_name"`
+		BetAmount    float64 `json:"bet_amount"`
+		BetResult    float64 `json:"bet_result"`
+		BetWinLoss   float64 `json:"bet_winloss"`
 	}
 
 	var sums []SumResult
 
 	// Retrieve and validate query parameters
-	key_depost := c.Query("key_depost")
+	dateTimeStart := c.Query("dateTimeStart")
+	dateTimeEnd := c.Query("dateTimeEnd")
+
+	// Check if dates are provided
+	if dateTimeStart == "" || dateTimeEnd == "" {
+		return utils.ErrorResponse(c, http.StatusBadRequest, "Missing required date parameters.", "dateTimeStart or dateTimeEnd is missing.")
+	}
+
+	// Optional: Parse dates to ensure they are valid (assuming format "2006-01-02 15:04:05")
+	_, err := time.Parse("2006-01-02 15:04:05", dateTimeStart)
+	if err != nil {
+		return utils.ErrorResponse(c, http.StatusBadRequest, "Invalid dateTimeStart format.", err.Error())
+	}
+	_, err = time.Parse("2006-01-02 15:04:05", dateTimeEnd)
+	if err != nil {
+		return utils.ErrorResponse(c, http.StatusBadRequest, "Invalid dateTimeEnd format.", err.Error())
+	}
+	fmt.Println(dateTimeStart)
+	fmt.Println(dateTimeEnd)
 	// Perform the query with GROUP BY product_name
 	if err := database.DB.Model(&models.Reports{}).
-		Select("category_name, SUM(bet_winloss) AS win_lose").
-		Where("key_deposit = ? ", key_depost).
+		Select("category_name, SUM(bet_amount) AS bet_amount, SUM(bet_result) AS bet_result, SUM(bet_winloss) AS bet_winloss").
+		Where("created_at BETWEEN ? AND ?", dateTimeStart, dateTimeEnd).
 		Group("category_name").
 		Scan(&sums).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
@@ -250,12 +271,102 @@ func GetReportGameByCategoryName(c *fiber.Ctx) error {
 		}
 		return utils.ErrorResponse(c, http.StatusBadRequest, "Failed to calculate sums.", err.Error())
 	}
+	// fmt.Println(sums)
+	reportData := map[string]fiber.Map{
+		"Sportsbook":      {"name": "Sportsbook", "bet_amount": 0, "bet_result": 0, "bet_winloss": 0},
+		"Live Casino":     {"name": "Live Casino", "bet_amount": 0, "bet_result": 0, "bet_winloss": 0},
+		"Slot Game":       {"name": "Slot Game", "bet_amount": 0, "bet_result": 0, "bet_winloss": 0},
+		"Fishing Hunter":  {"name": "Fishing Hunter", "bet_amount": 0, "bet_result": 0, "bet_winloss": 0},
+		"Game Card":       {"name": "Game Card", "bet_amount": 0, "bet_result": 0, "bet_winloss": 0},
+		"Lotto":           {"name": "Lotto", "bet_amount": 0, "bet_result": 0, "bet_winloss": 0},
+		"E-Sport":         {"name": "E-Sport", "bet_amount": 0, "bet_result": 0, "bet_winloss": 0},
+		"Poker Game":      {"name": "Poker Game", "bet_amount": 0, "bet_result": 0, "bet_winloss": 0},
+		"Keno":            {"name": "Keno", "bet_amount": 0, "bet_result": 0, "bet_winloss": 0},
+		"Crypto Tradding": {"name": "Crypto Trading", "bet_amount": 0, "bet_result": 0, "bet_winloss": 0},
+		"Pg100":           {"name": "Pg100", "bet_amount": 0, "bet_result": 0, "bet_winloss": 0},
+	}
+
+	for _, v := range sums {
+		if data, exists := reportData[v.CategoryName]; exists {
+			data["bet_amount"] = v.BetAmount
+			data["bet_result"] = v.BetResult
+			data["bet_winloss"] = math.Round((v.BetResult-v.BetAmount)*100) / 100
+			reportData[v.CategoryName] = data
+		}
+	}
 
 	// Prepare the response
 	response := fiber.Map{
-		"data": sums,
+		"data": reportData,
 	}
+	fmt.Println(response)
 
 	// Return the response
+	return utils.SuccessResponse(c, response, "Get report game successfully.")
+}
+
+func GetReportGameByCategoryName(c *fiber.Ctx) error {
+
+	// Struct สำหรับเก็บข้อมูลการคำนวณ
+	type SumResult struct {
+		CategoryName string  `json:"category_name"`
+		WinLose      float64 `json:"win_lose"`
+	}
+
+	// Struct สำหรับรับค่า request
+	type RequestBody struct {
+		Username  string `json:"username"`
+		KeyDepost string `json:"key_depost"`
+	}
+
+	// พาร์ส JSON body
+	var body RequestBody
+	if err := c.BodyParser(&body); err != nil {
+		return utils.ErrorResponse(c, http.StatusBadRequest, "Invalid request body format.", err.Error())
+	}
+
+	var sums []SumResult
+
+	// ทำการ query ข้อมูลพร้อม GROUP BY category_name
+	if err := database.DB.Model(&models.Reports{}).
+		Select("category_name, SUM(bet_amount) AS win_lose").
+		Where("key_deposit = ? AND username = ?", body.KeyDepost, body.Username).
+		Group("category_name").
+		Scan(&sums).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return utils.ErrorResponse(c, http.StatusNotFound, "No records found for the specified parameters.", "")
+		}
+		return utils.ErrorResponse(c, http.StatusBadRequest, "Failed to calculate sums.", err.Error())
+	}
+
+	// เตรียมข้อมูลประเภทเกมพร้อมค่าเริ่มต้น
+	reportData := map[string]fiber.Map{
+		"Sportsbook":      {"name": "Sportsbook", "win_lose": 0},
+		"Live Casino":     {"name": "Live Casino", "win_lose": 0},
+		"Slot Game":       {"name": "Slot Game", "win_lose": 0},
+		"Fishing Hunter":  {"name": "Fishing Hunter", "win_lose": 0},
+		"Game Card":       {"name": "Game Card", "win_lose": 0},
+		"Lotto":           {"name": "Lotto", "win_lose": 0},
+		"E-Sport":         {"name": "E-Sport", "win_lose": 0},
+		"Poker Game":      {"name": "Poker Game", "win_lose": 0},
+		"Keno":            {"name": "Keno", "win_lose": 0},
+		"Crypto Tradding": {"name": "Crypto Trading", "win_lose": 0},
+		"Pg100":           {"name": "Pg100", "win_lose": 0},
+	}
+
+	// อัปเดตค่า win_lose สำหรับประเภทเกมที่มีข้อมูลใน sums
+	for _, v := range sums {
+		if data, exists := reportData[v.CategoryName]; exists {
+			data["win_lose"] = v.WinLose
+			reportData[v.CategoryName] = data
+		}
+	}
+
+	// เตรียมข้อมูลสำหรับการตอบกลับ
+	response := fiber.Map{
+		"data": reportData,
+	}
+
+	// ส่งการตอบกลับ
 	return utils.SuccessResponse(c, response, "Get report game successfully.")
 }

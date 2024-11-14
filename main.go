@@ -5,6 +5,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/joho/godotenv"
 
 	// "github.com/joho/godotenv"
 
@@ -25,11 +26,11 @@ func main() {
 	}))
 
 	// Connect  Database
-	// err := godotenv.Load()
-	// if err != nil {
-	// 	log.Fatal("Error loading env")
-	// 	log.Fatal(err)
-	// }
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading env")
+		log.Fatal(err)
+	}
 
 	if err := database.PG_Connect(); err != nil {
 		log.Fatal(err)
