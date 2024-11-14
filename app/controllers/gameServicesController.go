@@ -301,6 +301,7 @@ func launchGameGplay(launchReq LaunchRequest) (string, error) {
 		return "", fmt.Errorf("failed to make external API call: %w", err)
 	}
 	defer resp.Body.Close()
+	fmt.Println("resp.StatusCode = ")
 	fmt.Println(resp.StatusCode)
 	// Check the response status code
 	if resp.StatusCode != http.StatusOK {
