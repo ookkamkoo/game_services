@@ -402,6 +402,51 @@ func CreditProvider(c *fiber.Ctx) error {
 			fmt.Println("Error saving report:", err)
 			return err
 		}
+	} else {
+		if err := database.DB.Model(&models.GplayTransactions{}).
+			Where("round_id = ?", req.RoundId).
+			Select("COALESCE(SUM(bet_amount), 0) AS sum_bet_amount, COALESCE(SUM(payout_amount), 0) AS sum_payout_amount").
+			Scan(&sumGplay).Error; err != nil {
+			fmt.Println("Error calculating sum:", err)
+			return err
+		}
+
+		var winLoss = sumGplay.SumPayoutAmount - sumGplay.SumBetAmount
+		var status = ""
+		if winLoss > 0 {
+			status = "WIN"
+		} else if winLoss == 0 {
+			status = "EQ"
+		} else {
+			status = "LOSS"
+		}
+		if req.CategoryName == "Live Casino" {
+			var report models.Reports
+			report.UserID = data.Data.UserID
+			report.Username = data.Data.Username
+			report.KeyDeposit = data.Data.KeyDeposit
+			report.CategoryName = req.CategoryName
+			report.AgentID = data.Data.AgentID
+			report.RoundId = req.RoundId
+			report.RoundCheck = req.RoundId
+			report.ProductId = req.ProductName
+			report.ProductName = req.ProductName
+			report.GameId = req.GameCode
+			report.GameName = req.GameName
+			report.WalletAmountBefore = data.Data.BalanceBefore + (sumGplay.SumBetAmount - sumGplay.SumPayoutAmount)
+			report.WalletAmountAfter = data.Data.BalanceAfter
+			report.BetAmount = sumGplay.SumBetAmount
+			report.BetResult = sumGplay.SumPayoutAmount
+			report.BetWinloss = winLoss
+			report.Status = status
+			report.IP = utils.GetIP()
+			report.Description = ""
+			report.CreatedAt = time.Now()
+			if err := database.DB.Create(&report).Error; err != nil {
+				fmt.Println("Error saving report:", err)
+				return err
+			}
+		}
 	}
 
 	// สร้าง response เวลาปัจจุบัน
