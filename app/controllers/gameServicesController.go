@@ -317,7 +317,7 @@ func launchGameGplay(launchReq LaunchRequest) (string, error) {
 	if err := json.NewDecoder(resp.Body).Decode(&responseMap); err != nil {
 		return "", fmt.Errorf("failed to decode response: %w", err)
 	}
-
+	fmt.Println(responseMap)
 	// Check if the response contains an error code
 	if responseMap.Code != 0 {
 		return "", fmt.Errorf("error from external API: %s", responseMap.Msg)
