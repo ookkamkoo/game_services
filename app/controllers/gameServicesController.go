@@ -301,37 +301,35 @@ func launchGameGplay(launchReq LaunchRequest) (string, error) {
 		return "", fmt.Errorf("failed to make external API call: %w", err)
 	}
 	defer resp.Body.Close()
-	fmt.Println("resp.StatusCode = ")
-	fmt.Println(resp.StatusCode)
+
 	// Check the response status code
 	if resp.StatusCode != http.StatusOK {
 		return "", fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
 	// Decode the response body into a JSON map
-	// var responseMap struct {
-	// 	Code int                    `json:"code"`
-	// 	Data map[string]interface{} `json:"data"`
-	// 	Msg  string                 `json:"msg"`
-	// }
-	var responseMap map[string]string
+	var responseMap struct {
+		Code int                    `json:"code"`
+		Data map[string]interface{} `json:"data"`
+		Msg  string                 `json:"msg"`
+	}
 	if err := json.NewDecoder(resp.Body).Decode(&responseMap); err != nil {
 		return "", fmt.Errorf("failed to decode response: %w", err)
 	}
-	fmt.Println(responseMap)
-	// // Check if the response contains an error code
-	// if responseMap.Code != 0 {
-	// 	return "", fmt.Errorf("error from external API: %s", responseMap.Msg)
-	// }
 
-	// // Retrieve the game URL from the response data
-	// gameUrl, ok := responseMap.Data["gameUrl"].(string)
-	// if !ok {
-	// 	return "", errors.New("missing gameUrl in response")
-	// }
+	// Check if the response contains an error code
+	if responseMap.Code != 0 {
+		return "", fmt.Errorf("error from external API: %s", responseMap.Msg)
+	}
+
+	// Retrieve the game URL from the response data
+	gameUrl, ok := responseMap.Data["gameUrl"].(string)
+	if !ok {
+		return "", errors.New("missing gameUrl in response")
+	}
 
 	// Return the game URL on success
-	return "gameUrl", nil
+	return gameUrl, nil
 }
 
 func LaunchGames(c *fiber.Ctx) error {
