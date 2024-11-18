@@ -11,6 +11,7 @@ type ReportGameRequest struct {
 	DateTimeStart string  `json:"dateTimeStart"`
 	DateTimeEnd   string  `json:"dateTimeEnd"`
 	DateSelect    string  `json:"dateSelect"`
+	Game          string  `json:"game"`
 	Username      string  `json:"username"`
 	Amount        float32 `json:"amount"`
 	Page          int     `json:"page"`

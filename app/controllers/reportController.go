@@ -84,6 +84,11 @@ func GetReportGame(c *fiber.Ctx) error {
 		query2 = query2.Where("username LIKE ?", "%"+body.Username+"%")
 	}
 
+	if body.Game != "" {
+		query = query.Where("game_name LIKE ?", "%"+body.Game+"%")
+		query2 = query2.Where("game_name LIKE ?", "%"+body.Game+"%")
+	}
+
 	if body.DateSelect != "" && body.DateSelect != "all" {
 		query = query.Where("status = ?", body.DateSelect)
 		query2 = query2.Where("status = ?", body.DateSelect)
