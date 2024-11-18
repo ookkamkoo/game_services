@@ -21,26 +21,44 @@ type BetWinLossSummary struct {
 func GetBetWinLossSummary(c *fiber.Ctx) error {
 	var results []models.BetWinLossSummary
 
-	now := time.Now()
+	// Load the desired time zone (e.g., "Asia/Bangkok")
+	location, err := time.LoadLocation("Asia/Bangkok")
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error":   true,
+			"message": "Failed to load time zone",
+		})
+	}
+
+	// Get yesterday's start and end times in the specified time zone
+	now := time.Now().In(location)
 	yesterday := now.AddDate(0, 0, -1)
-	yesterdayStart := time.Date(yesterday.Year(), yesterday.Month(), yesterday.Day(), 0, 0, 0, 0, yesterday.Location())
-	yesterdayEnd := time.Date(yesterday.Year(), yesterday.Month(), yesterday.Day(), 23, 59, 59, 0, yesterday.Location())
+	yesterdayStart := time.Date(yesterday.Year(), yesterday.Month(), yesterday.Day(), 0, 0, 0, 0, location)
+	yesterdayEnd := time.Date(yesterday.Year(), yesterday.Month(), yesterday.Day(), 23, 59, 59, 0, location)
+
+	// Format dates for SQL query
 	layout := "2006-01-02 15:04:05"
 	yesterdayStartFormatted := yesterdayStart.Format(layout)
 	yesterdayEndFormatted := yesterdayEnd.Format(layout)
 
-	fmt.Println(yesterdayStartFormatted)
-	fmt.Println(yesterdayEndFormatted)
+	// Debug output
+	fmt.Println("Start:", yesterdayStartFormatted)
+	fmt.Println("End:", yesterdayEndFormatted)
 
+	// Query database for summary
 	if err := database.DB.Model(&models.Reports{}).
 		Select("user_id, CAST(SUM(bet_winloss) AS FLOAT) as bet_winloss").
-		Where("created_at >= ? AND created_at <= ?", yesterdayStartFormatted, yesterdayEndFormatted).Group("user_id").Having("SUM(bet_winloss) < 0").Find(&results).Error; err != nil {
+		Where("created_at >= ? AND created_at <= ?", yesterdayStartFormatted, yesterdayEndFormatted).
+		Group("user_id").
+		Having("SUM(bet_winloss) < 0").
+		Find(&results).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error":   true,
 			"message": "Failed to fetch bet win/loss summary",
 		})
 	}
 
+	// Return successful response
 	return utils.SuccessResponse(c, results, "Bet win/loss summary retrieved successfully.")
 }
 
