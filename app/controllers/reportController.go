@@ -42,6 +42,7 @@ func GetBetWinLossSummary(c *fiber.Ctx) error {
 	yesterdayEndFormatted := yesterdayEnd.Format(layout)
 
 	// Debug output
+	fmt.Println("Date")
 	fmt.Println("Start:", yesterdayStartFormatted)
 	fmt.Println("End:", yesterdayEndFormatted)
 
