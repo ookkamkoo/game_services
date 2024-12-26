@@ -143,17 +143,21 @@ func BalanceProvider(c *fiber.Ctx) error {
 	}
 	fmt.Println(req)
 
+	responseTime := time.Now().Format("2006-01-02 15:04:05")
 	if CheckProvider(req.AgentUsername, req.OperatorToken, req.SeamlessKey) {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"code": 1004,
-			"msg":  "Invalid request",
-		})
+		response := fiber.Map{
+			"code":         1004,
+			"msg":          "Player has Insufficient Balance to Place Bet",
+			"balance":      0,
+			"responseTime": responseTime,
+			"responseUid":  req.RequestUid,
+		}
+		return c.JSON(response)
 	}
 
 	// balance := 1000 // Replace with actual balance logic
 	fmt.Println("data")
 	data, err := getBalanceServer(req.PlayerUsername)
-	responseTime := time.Now().Format("2006-01-02 15:04:05")
 	fmt.Println(data)
 	if err != nil {
 		fmt.Println(err)
@@ -217,11 +221,19 @@ func DebitProvider(c *fiber.Ctx) error {
 	}
 	fmt.Println("Parsed Request:", req)
 
+	responseTime := time.Now().Format("2006-01-02 15:04:05")
 	if CheckProvider(req.AgentUsername, req.OperatorToken, req.SeamlessKey) {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"code": 1004,
-			"msg":  "Invalid request",
-		})
+		response := fiber.Map{
+			"code":         1004,
+			"msg":          "Player has Insufficient Balance to Place Bet",
+			"balance":      0,
+			"responseTime": responseTime,
+			"responseUid":  req.RequestUid,
+		}
+
+		fmt.Println("response")
+		fmt.Println(response)
+		return c.JSON(response)
 	}
 
 	// พาร์ส JSON string ของ EventDetail เป็น struct EventDetail
@@ -300,7 +312,6 @@ func DebitProvider(c *fiber.Ctx) error {
 	}
 
 	// ส่งข้อมูลตอบกลับ
-	responseTime := time.Now().Format("2006-01-02 15:04:05")
 	response := fiber.Map{
 		"code":         0,
 		"msg":          "Debit successful",
@@ -332,11 +343,19 @@ func CreditProvider(c *fiber.Ctx) error {
 	}
 	fmt.Println("Parsed Request:", req)
 
+	responseTime := time.Now().Format("2006-01-02 15:04:05")
 	if CheckProvider(req.AgentUsername, req.OperatorToken, req.SeamlessKey) {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"code": 1004,
-			"msg":  "Invalid request",
-		})
+		response := fiber.Map{
+			"code":         1004,
+			"msg":          "Player has Insufficient Balance to Place Bet",
+			"balance":      0,
+			"responseTime": responseTime,
+			"responseUid":  req.RequestUid,
+		}
+
+		fmt.Println("response")
+		fmt.Println(response)
+		return c.JSON(response)
 	}
 
 	// พาร์ส JSON string ของ EventDetail เป็น struct EventDetail
@@ -499,7 +518,6 @@ func CreditProvider(c *fiber.Ctx) error {
 	}
 
 	// สร้าง response เวลาปัจจุบัน
-	responseTime := time.Now().Format("2006-01-02 15:04:05")
 
 	// Log สำหรับการทำรายการเติมเงินสำเร็จ
 	fmt.Printf("Credit successful for %s, amount: %.2f, new balance: %.2f\n", req.PlayerUsername, req.Amount, data.Data.BalanceAfter)
@@ -537,11 +555,19 @@ func RollbackProvider(c *fiber.Ctx) error {
 	}
 	fmt.Println("Parsed Request:", req)
 
+	responseTime := time.Now().Format("2006-01-02 15:04:05")
 	if CheckProvider(req.AgentUsername, req.OperatorToken, req.SeamlessKey) {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"code": 1004,
-			"msg":  "Invalid request",
-		})
+		response := fiber.Map{
+			"code":         1004,
+			"msg":          "Player has Insufficient Balance to Place Bet",
+			"balance":      0,
+			"responseTime": responseTime,
+			"responseUid":  req.RequestUid,
+		}
+
+		fmt.Println("response")
+		fmt.Println(response)
+		return c.JSON(response)
 	}
 
 	// พาร์ส JSON string ของ EventDetail เป็น struct EventDetail
@@ -659,7 +685,6 @@ func RollbackProvider(c *fiber.Ctx) error {
 	}
 
 	// สร้าง response เวลาปัจจุบัน
-	responseTime := time.Now().Format("2006-01-02 15:04:05")
 
 	// Log สำหรับการทำรายการเติมเงินสำเร็จ
 	fmt.Printf("Credit successful for %s, amount: %.2f, new balance: %.2f\n", req.PlayerUsername, req.Amount, data.Data.BalanceAfter)
@@ -697,11 +722,19 @@ func RewardProvider(c *fiber.Ctx) error {
 	}
 	fmt.Println("Parsed Request:", req)
 
+	responseTime := time.Now().Format("2006-01-02 15:04:05")
 	if CheckProvider(req.AgentUsername, req.OperatorToken, req.SeamlessKey) {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"code": 1004,
-			"msg":  "Invalid request",
-		})
+		response := fiber.Map{
+			"code":         1004,
+			"msg":          "Player has Insufficient Balance to Place Bet",
+			"balance":      0,
+			"responseTime": responseTime,
+			"responseUid":  req.RequestUid,
+		}
+
+		fmt.Println("response")
+		fmt.Println(response)
+		return c.JSON(response)
 	}
 
 	// พาร์ส JSON string ของ EventDetail เป็น struct EventDetail
@@ -819,7 +852,6 @@ func RewardProvider(c *fiber.Ctx) error {
 	}
 
 	// สร้าง response เวลาปัจจุบัน
-	responseTime := time.Now().Format("2006-01-02 15:04:05")
 
 	// Log สำหรับการทำรายการเติมเงินสำเร็จ
 	fmt.Printf("Credit successful for %s, amount: %.2f, new balance: %.2f\n", req.PlayerUsername, req.Amount, data.Data.BalanceAfter)
