@@ -446,10 +446,10 @@ func CreditProvider(c *fiber.Ctx) error {
 	if req.EventDetail != "" {
 		if err := json.Unmarshal([]byte(req.EventDetail), &eventDetail); err != nil {
 			fmt.Println("เกิดข้อผิดพลาดในการพาร์ส EventDetail:", err)
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"code": -1,
-				"msg":  "รูปแบบ EventDetail ไม่ถูกต้อง",
-			})
+			// return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			// 	"code": -1,
+			// 	"msg":  "รูปแบบ EventDetail ไม่ถูกต้อง",
+			// })
 		}
 	} else {
 		fmt.Println("EventDetail เป็นค่าว่าง ข้ามการพาร์ส")
