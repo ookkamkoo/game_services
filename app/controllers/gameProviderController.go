@@ -115,7 +115,7 @@ type RewardRequest struct {
 	Timestamp      string  `json:"timestamp"`
 }
 
-func CheckProvider(nameBody string, operatorBody string, secretBody string) bool {
+func CheckProvider(nameBody string, operatorBody string, secretBody string, playerUsername string, currencyCode string) bool {
 	name := os.Getenv("agentUsername")
 	operator := os.Getenv("operatorToken")
 	secret := os.Getenv("seamlessKey")
@@ -124,6 +124,9 @@ func CheckProvider(nameBody string, operatorBody string, secretBody string) bool
 	fmt.Println("name = ", name)
 	fmt.Println("operatorBody = ", operator)
 	fmt.Println("secretBody = ", secret)
+	if operatorBody == "" || secretBody == "" || playerUsername == "" || currencyCode == "" {
+
+	}
 	if operatorBody == operator && secretBody == secret {
 		fmt.Println("aaaaaaa")
 		return true
@@ -147,7 +150,7 @@ func BalanceProvider(c *fiber.Ctx) error {
 	fmt.Println(req)
 
 	responseTime := time.Now().Format("2006-01-02 15:04:05")
-	if !CheckProvider(req.AgentUsername, req.OperatorToken, req.SeamlessKey) {
+	if !CheckProvider(req.AgentUsername, req.OperatorToken, req.SeamlessKey, req.PlayerUsername, req.CurrencyCode) {
 		response := fiber.Map{
 			"code":         1004,
 			"msg":          "Player has Insufficient Balance to Place Bet",
@@ -225,7 +228,7 @@ func DebitProvider(c *fiber.Ctx) error {
 	fmt.Println("Parsed Request:", req)
 
 	responseTime := time.Now().Format("2006-01-02 15:04:05")
-	if CheckProvider(req.AgentUsername, req.OperatorToken, req.SeamlessKey) {
+	if !CheckProvider(req.AgentUsername, req.OperatorToken, req.SeamlessKey, req.PlayerUsername, req.CurrencyCode) {
 		response := fiber.Map{
 			"code":         1004,
 			"msg":          "Player has Insufficient Balance to Place Bet",
@@ -347,7 +350,7 @@ func CreditProvider(c *fiber.Ctx) error {
 	fmt.Println("Parsed Request:", req)
 
 	responseTime := time.Now().Format("2006-01-02 15:04:05")
-	if CheckProvider(req.AgentUsername, req.OperatorToken, req.SeamlessKey) {
+	if !CheckProvider(req.AgentUsername, req.OperatorToken, req.SeamlessKey, req.PlayerUsername, req.CurrencyCode) {
 		response := fiber.Map{
 			"code":         1004,
 			"msg":          "Player has Insufficient Balance to Place Bet",
@@ -559,7 +562,7 @@ func RollbackProvider(c *fiber.Ctx) error {
 	fmt.Println("Parsed Request:", req)
 
 	responseTime := time.Now().Format("2006-01-02 15:04:05")
-	if CheckProvider(req.AgentUsername, req.OperatorToken, req.SeamlessKey) {
+	if !CheckProvider(req.AgentUsername, req.OperatorToken, req.SeamlessKey, req.PlayerUsername, req.CurrencyCode) {
 		response := fiber.Map{
 			"code":         1004,
 			"msg":          "Player has Insufficient Balance to Place Bet",
@@ -726,7 +729,7 @@ func RewardProvider(c *fiber.Ctx) error {
 	fmt.Println("Parsed Request:", req)
 
 	responseTime := time.Now().Format("2006-01-02 15:04:05")
-	if CheckProvider(req.AgentUsername, req.OperatorToken, req.SeamlessKey) {
+	if !CheckProvider(req.AgentUsername, req.OperatorToken, req.SeamlessKey, req.PlayerUsername, req.CurrencyCode) {
 		response := fiber.Map{
 			"code":         1004,
 			"msg":          "Player has Insufficient Balance to Place Bet",
