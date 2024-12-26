@@ -150,14 +150,26 @@ func BalanceProvider(c *fiber.Ctx) error {
 		// return utils.SuccessResponse(c, response, "success")
 	}
 
-	// Prepare the response
-	response := fiber.Map{
-		"code":         0,
-		"msg":          "Successful",
-		"balance":      data.Data.Balance,
-		"responseTime": responseTime,
-		"responseUid":  req.RequestUid,
+	var response fiber.Map
+	if data.Data.Status != "" {
+		response = fiber.Map{
+			"code":         9999,
+			"msg":          data.Message,
+			"balance":      data.Data.Balance,
+			"responseTime": responseTime,
+			"responseUid":  req.RequestUid,
+		}
+	} else {
+		// Prepare the response
+		response = fiber.Map{
+			"code":         0,
+			"msg":          "Successful",
+			"balance":      data.Data.Balance,
+			"responseTime": responseTime,
+			"responseUid":  req.RequestUid,
+		}
 	}
+
 	fmt.Println("response")
 	fmt.Println(response)
 	// Return the JSON response
