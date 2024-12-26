@@ -250,6 +250,18 @@ func DebitProvider(c *fiber.Ctx) error {
 		return c.JSON(response)
 	}
 
+	if req.CurrencyCode != os.Getenv("currencyCode") {
+		fmt.Println("OperatorToken is empty")
+		response := fiber.Map{
+			"code":         1002,
+			"msg":          "Invalid currency",
+			"balance":      0,
+			"responseTime": responseTime,
+			"responseUid":  req.RequestUid,
+		}
+		return c.JSON(response)
+	}
+
 	if CheckProvider(req.AgentUsername, req.OperatorToken, req.SeamlessKey) {
 		response := fiber.Map{
 			"code":         1004,
