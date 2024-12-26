@@ -120,6 +120,10 @@ func CheckProvider(nameBody string, operatorBody string, secretBody string) bool
 	operator := os.Getenv("operatorToken")
 	secret := os.Getenv("seamlessKey")
 	fmt.Println("=============== CheckProvider ===============")
+	fmt.Println("nameBody = ", nameBody)
+	fmt.Println("name = ", name)
+	fmt.Println("operatorBody = ", operator)
+	fmt.Println("secretBody = ", secret)
 	if nameBody == name && operatorBody == operator && secretBody == secret {
 		return true
 	}
