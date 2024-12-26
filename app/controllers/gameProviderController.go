@@ -308,6 +308,7 @@ func DebitProvider(c *fiber.Ctx) error {
 
 	// เรียกฟังก์ชัน settleServer เพื่อดึงข้อมูลยอดเงิน
 	data, err := settleServer(amountSettle, req.PlayerUsername)
+	fmt.Println(data)
 	if err != nil {
 		tx.Rollback() // ยกเลิก transaction หากเกิดข้อผิดพลาด
 		fmt.Println("Error retrieving balance:", err)
