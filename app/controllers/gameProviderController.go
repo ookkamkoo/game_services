@@ -161,7 +161,7 @@ func BalanceProvider(c *fiber.Ctx) error {
 		return c.JSON(response)
 	}
 
-	if !CheckProvider(req.AgentUsername, req.OperatorToken, req.SeamlessKey) {
+	if CheckProvider(req.AgentUsername, req.OperatorToken, req.SeamlessKey) {
 		response := fiber.Map{
 			"code":         1004,
 			"msg":          "Player has Insufficient Balance to Place Bet",
@@ -252,7 +252,7 @@ func DebitProvider(c *fiber.Ctx) error {
 		return c.JSON(response)
 	}
 
-	if !CheckProvider(req.AgentUsername, req.OperatorToken, req.SeamlessKey) {
+	if CheckProvider(req.AgentUsername, req.OperatorToken, req.SeamlessKey) {
 		response := fiber.Map{
 			"code":         1004,
 			"msg":          "Player has Insufficient Balance to Place Bet",
@@ -386,7 +386,7 @@ func CreditProvider(c *fiber.Ctx) error {
 		return c.JSON(response)
 	}
 
-	if !CheckProvider(req.AgentUsername, req.OperatorToken, req.SeamlessKey) {
+	if CheckProvider(req.AgentUsername, req.OperatorToken, req.SeamlessKey) {
 		response := fiber.Map{
 			"code":         1004,
 			"msg":          "Player has Insufficient Balance to Place Bet",
@@ -610,7 +610,7 @@ func RollbackProvider(c *fiber.Ctx) error {
 		return c.JSON(response)
 	}
 
-	if !CheckProvider(req.AgentUsername, req.OperatorToken, req.SeamlessKey) {
+	if CheckProvider(req.AgentUsername, req.OperatorToken, req.SeamlessKey) {
 		response := fiber.Map{
 			"code":         1004,
 			"msg":          "Player has Insufficient Balance to Place Bet",
@@ -788,7 +788,7 @@ func RewardProvider(c *fiber.Ctx) error {
 		}
 		return c.JSON(response)
 	}
-	if !CheckProvider(req.AgentUsername, req.OperatorToken, req.SeamlessKey) {
+	if CheckProvider(req.AgentUsername, req.OperatorToken, req.SeamlessKey) {
 		response := fiber.Map{
 			"code":         1004,
 			"msg":          "Player has Insufficient Balance to Place Bet",
