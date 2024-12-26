@@ -124,7 +124,7 @@ func CheckProvider(nameBody string, operatorBody string, secretBody string) bool
 	fmt.Println("name = ", name)
 	fmt.Println("operatorBody = ", operator)
 	fmt.Println("secretBody = ", secret)
-	if nameBody == name && operatorBody == operator && secretBody == secret {
+	if operatorBody == operator && secretBody == secret {
 		fmt.Println("aaaaaaa")
 		return true
 	}
