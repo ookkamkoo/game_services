@@ -342,12 +342,32 @@ func DebitProvider(c *fiber.Ctx) error {
 	}
 
 	// ส่งข้อมูลตอบกลับ
-	response := fiber.Map{
-		"code":         0,
-		"msg":          "Debit successful",
-		"balance":      data.Data.BalanceAfter,
-		"responseTime": responseTime,
-		"responseUid":  uuid.New().String(),
+	// response := fiber.Map{
+	// 	"code":         0,
+	// 	"msg":          "Debit successful",
+	// 	"balance":      data.Data.BalanceAfter,
+	// 	"responseTime": responseTime,
+	// 	"responseUid":  uuid.New().String(),
+	// }
+
+	var response fiber.Map
+	if data.Data.Status == "10001" {
+		response = fiber.Map{
+			"code":         1000,
+			"msg":          data.Message,
+			"balance":      0,
+			"responseTime": responseTime,
+			"responseUid":  req.RequestUid,
+		}
+	} else {
+		// Prepare the response
+		response = fiber.Map{
+			"code":         0,
+			"msg":          "Successful",
+			"balance":      data.Data.BalanceAfter,
+			"responseTime": responseTime,
+			"responseUid":  req.RequestUid,
+		}
 	}
 
 	fmt.Println("Response:", response)
