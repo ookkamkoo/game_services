@@ -374,7 +374,7 @@ func DebitProvider(c *fiber.Ctx) error {
 		}
 	} else if data.Data.Status == "10002" {
 		response = fiber.Map{
-			"code":         1002,
+			"code":         1006,
 			"msg":          data.Message,
 			"balance":      0,
 			"responseTime": responseTime,
