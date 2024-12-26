@@ -147,7 +147,7 @@ func BalanceProvider(c *fiber.Ctx) error {
 	fmt.Println(req)
 
 	responseTime := time.Now().Format("2006-01-02 15:04:05")
-	if CheckProvider(req.AgentUsername, req.OperatorToken, req.SeamlessKey) {
+	if !CheckProvider(req.AgentUsername, req.OperatorToken, req.SeamlessKey) {
 		response := fiber.Map{
 			"code":         1004,
 			"msg":          "Player has Insufficient Balance to Place Bet",
