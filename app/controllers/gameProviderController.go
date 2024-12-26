@@ -116,21 +116,19 @@ type RewardRequest struct {
 }
 
 func CheckProvider(nameBody string, operatorBody string, secretBody string) bool {
-	name := os.Getenv("agentUsername")
+	// name := os.Getenv("agentUsername")
 	operator := os.Getenv("operatorToken")
 	secret := os.Getenv("seamlessKey")
-	fmt.Println("=============== CheckProvider ===============")
-	fmt.Println("nameBody = ", nameBody)
-	fmt.Println("name = ", name)
-	fmt.Println("operatorBody = ", operatorBody)
-	fmt.Println("operator = ", operator)
-	fmt.Println("secretBody = ", secretBody)
-	fmt.Println("secret = ", secret)
+
+	// fmt.Println("nameBody = ", nameBody)
+	// fmt.Println("name = ", name)
+	// fmt.Println("operatorBody = ", operatorBody)
+	// fmt.Println("operator = ", operator)
+	// fmt.Println("secretBody = ", secretBody)
+	// fmt.Println("secret = ", secret)
 	if operatorBody != operator || secretBody != secret {
-		fmt.Println("aaaaaaa")
 		return true
 	}
-	fmt.Println("=============== CheckProvider end ===============")
 	return false
 }
 
@@ -271,10 +269,12 @@ func DebitProvider(c *fiber.Ctx) error {
 	if req.EventDetail != "" {
 		if err := json.Unmarshal([]byte(req.EventDetail), &eventDetail); err != nil {
 			fmt.Println("เกิดข้อผิดพลาดในการพาร์ส EventDetail:", err)
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"code": -1,
-				"msg":  "รูปแบบ EventDetail ไม่ถูกต้อง",
-			})
+			// return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			// 	"code": -1,
+			// 	"msg":  "รูปแบบ EventDetail ไม่ถูกต้อง",
+			// })
+			eventDetail.IsFeature = false
+			eventDetail.IsFeatureBuy = false
 		}
 	} else {
 		eventDetail.IsFeature = false
