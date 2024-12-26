@@ -320,7 +320,7 @@ func DebitProvider(c *fiber.Ctx) error {
 	fmt.Println("amountSettle =", amountSettle)
 
 	// เรียกฟังก์ชัน settleServer เพื่อดึงข้อมูลยอดเงิน
-	data, err := settleServer(amountSettle, req.PlayerUsername)
+	data, err := settleServer(amountSettle, req.PlayerUsername, req.IsRefund)
 	fmt.Println(data)
 	if err != nil {
 		tx.Rollback() // ยกเลิก transaction หากเกิดข้อผิดพลาด
@@ -491,7 +491,7 @@ func CreditProvider(c *fiber.Ctx) error {
 	fmt.Println("amountSettle =", amountSettle)
 
 	// เรียกฟังก์ชัน settleServer เพื่อทำการเติมเงิน
-	data, err := settleServer(amountSettle, req.PlayerUsername)
+	data, err := settleServer(amountSettle, req.PlayerUsername, req.IsRefund)
 	if err != nil {
 		fmt.Println("Error retrieving balance:", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -715,7 +715,7 @@ func RollbackProvider(c *fiber.Ctx) error {
 	fmt.Println("amountSettle =", amountSettle)
 
 	// เรียกฟังก์ชัน settleServer เพื่อทำการเติมเงิน
-	data, err := settleServer(amountSettle, req.PlayerUsername)
+	data, err := settleServer(amountSettle, req.PlayerUsername, false)
 	if err != nil {
 		fmt.Println("Error retrieving balance:", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -893,7 +893,7 @@ func RewardProvider(c *fiber.Ctx) error {
 	fmt.Println("amountSettle =", amountSettle)
 
 	// เรียกฟังก์ชัน settleServer เพื่อทำการเติมเงิน
-	data, err := settleServer(amountSettle, req.PlayerUsername)
+	data, err := settleServer(amountSettle, req.PlayerUsername, false)
 	if err != nil {
 		fmt.Println("Error retrieving balance:", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
