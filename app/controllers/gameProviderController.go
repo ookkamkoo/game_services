@@ -115,6 +115,17 @@ type RewardRequest struct {
 	Timestamp      string  `json:"timestamp"`
 }
 
+func CheckProvider(nameBody string, operatorBody string, secretBody string) bool {
+	name := os.Getenv("agentUsername")
+	operator := os.Getenv("operatorToken")
+	secret := os.Getenv("seamlessKey")
+	fmt.Println("=============== CheckProvider ===============")
+	if nameBody == name && operatorBody == operator && secretBody == secret {
+		return true
+	}
+	return false
+}
+
 func BalanceProvider(c *fiber.Ctx) error {
 	fmt.Println("=============== BalanceProvider =================")
 	// Parse JSON body into BalanceRequest struct
@@ -184,17 +195,6 @@ func BalanceProvider(c *fiber.Ctx) error {
 	return c.JSON(response)
 }
 
-func CheckProvider(nameBody string, operatorBody string, secretBody string) bool {
-	name := os.Getenv("agentUsername")
-	operator := os.Getenv("operatorToken")
-	secret := os.Getenv("seamlessKey")
-
-	if nameBody == name && operatorBody == operator && secretBody == secret {
-		return true
-	}
-	return false
-}
-
 func DebitProvider(c *fiber.Ctx) error {
 	fmt.Println("=============== DebitProvider =================")
 
@@ -212,6 +212,13 @@ func DebitProvider(c *fiber.Ctx) error {
 		})
 	}
 	fmt.Println("Parsed Request:", req)
+
+	if CheckProvider(req.AgentUsername, req.OperatorToken, req.SeamlessKey) {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"code": 1004,
+			"msg":  "Invalid request",
+		})
+	}
 
 	// พาร์ส JSON string ของ EventDetail เป็น struct EventDetail
 	var eventDetail EventDetail
@@ -320,6 +327,13 @@ func CreditProvider(c *fiber.Ctx) error {
 		})
 	}
 	fmt.Println("Parsed Request:", req)
+
+	if CheckProvider(req.AgentUsername, req.OperatorToken, req.SeamlessKey) {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"code": 1004,
+			"msg":  "Invalid request",
+		})
+	}
 
 	// พาร์ส JSON string ของ EventDetail เป็น struct EventDetail
 	var eventDetail EventDetail
@@ -519,6 +533,13 @@ func RollbackProvider(c *fiber.Ctx) error {
 	}
 	fmt.Println("Parsed Request:", req)
 
+	if CheckProvider(req.AgentUsername, req.OperatorToken, req.SeamlessKey) {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"code": 1004,
+			"msg":  "Invalid request",
+		})
+	}
+
 	// พาร์ส JSON string ของ EventDetail เป็น struct EventDetail
 	var eventDetail EventDetail
 	if req.EventDetail != "" {
@@ -671,6 +692,13 @@ func RewardProvider(c *fiber.Ctx) error {
 		})
 	}
 	fmt.Println("Parsed Request:", req)
+
+	if CheckProvider(req.AgentUsername, req.OperatorToken, req.SeamlessKey) {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"code": 1004,
+			"msg":  "Invalid request",
+		})
+	}
 
 	// พาร์ส JSON string ของ EventDetail เป็น struct EventDetail
 	var eventDetail EventDetail
