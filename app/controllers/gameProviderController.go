@@ -6,6 +6,7 @@ import (
 	"game_services/app/database"
 	"game_services/app/models"
 	"game_services/app/utils"
+	"os"
 	"strings"
 	"time"
 
@@ -127,6 +128,13 @@ func BalanceProvider(c *fiber.Ctx) error {
 	}
 	fmt.Println(req)
 
+	if CheckProvider(req.AgentUsername, req.OperatorToken, req.SeamlessKey) {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"code": 1004,
+			"msg":  "Invalid request",
+		})
+	}
+
 	// balance := 1000 // Replace with actual balance logic
 	fmt.Println("data")
 	data, err := getBalanceServer(req.PlayerUsername)
@@ -174,6 +182,17 @@ func BalanceProvider(c *fiber.Ctx) error {
 	fmt.Println(response)
 	// Return the JSON response
 	return c.JSON(response)
+}
+
+func CheckProvider(nameBody string, operatorBody string, secretBody string) bool {
+	name := os.Getenv("agentUsername")
+	operator := os.Getenv("operatorToken")
+	secret := os.Getenv("seamlessKey")
+
+	if nameBody == name && operatorBody == operator && secretBody == secret {
+		return true
+	}
+	return false
 }
 
 func DebitProvider(c *fiber.Ctx) error {
