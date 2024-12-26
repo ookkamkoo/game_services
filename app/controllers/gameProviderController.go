@@ -372,6 +372,14 @@ func DebitProvider(c *fiber.Ctx) error {
 			"responseTime": responseTime,
 			"responseUid":  req.RequestUid,
 		}
+	} else if data.Data.Status == "10002" {
+		response = fiber.Map{
+			"code":         1002,
+			"msg":          data.Message,
+			"balance":      0,
+			"responseTime": responseTime,
+			"responseUid":  req.RequestUid,
+		}
 	} else {
 		// Prepare the response
 		response = fiber.Map{
