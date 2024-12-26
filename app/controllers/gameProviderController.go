@@ -262,6 +262,19 @@ func DebitProvider(c *fiber.Ctx) error {
 		return c.JSON(response)
 	}
 
+	// ตรวจสอบความซ้ำของ txnId
+	var existingTxn models.GplayTransactions
+	if err := database.DB.Where("txn_id = ?", req.TxnId).First(&existingTxn).Error; err == nil {
+		fmt.Println("Duplicate txnId detected:", req.TxnId)
+		return c.JSON(fiber.Map{
+			"code":         2001,
+			"msg":          "Duplicate txnId",
+			"balance":      0,
+			"responseTime": responseTime,
+			"responseUid":  req.RequestUid,
+		})
+	}
+
 	if CheckProvider(req.AgentUsername, req.OperatorToken, req.SeamlessKey) {
 		response := fiber.Map{
 			"code":         1004,
@@ -450,8 +463,13 @@ func CreditProvider(c *fiber.Ctx) error {
 			// 	"code": -1,
 			// 	"msg":  "รูปแบบ EventDetail ไม่ถูกต้อง",
 			// })
+
+			// eventDetail.IsFeature = false
+			// eventDetail.IsFeatureBuy = false
 		}
 	} else {
+		// eventDetail.IsFeature = false
+		// eventDetail.IsFeatureBuy = false
 		fmt.Println("EventDetail เป็นค่าว่าง ข้ามการพาร์ส")
 	}
 
