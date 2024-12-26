@@ -375,7 +375,7 @@ func DebitProvider(c *fiber.Ctx) error {
 	} else if data.Data.Status == "10002" {
 		response = fiber.Map{
 			"code":         1006,
-			"msg":          data.Message,
+			"msg":          "Player has Insufficient Balance to Place Bet",
 			"balance":      0,
 			"responseTime": responseTime,
 			"responseUid":  req.RequestUid,
