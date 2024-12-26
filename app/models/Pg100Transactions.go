@@ -54,6 +54,7 @@ type ResponseData struct {
 	Data struct {
 		Balance  float32 `json:"balance"`
 		Username string  `json:"username"`
+		Status   string  `json:"status"`
 	} `json:"data"`
 	Message string `json:"message"`
 	Status  string `json:"status"`

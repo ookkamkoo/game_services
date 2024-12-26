@@ -7,6 +7,11 @@ type BetWinLossSummary struct {
 	BetWinloss float32 `json:"bet_winloss"`
 }
 
+type BetWinLossSummaryAlliance struct {
+	AgentID    uint    `json:"agent_id"`
+	BetWinloss float32 `json:"bet_winloss"`
+}
+
 type ReportGameRequest struct {
 	DateTimeStart string  `json:"dateTimeStart"`
 	DateTimeEnd   string  `json:"dateTimeEnd"`

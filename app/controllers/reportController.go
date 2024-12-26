@@ -63,6 +63,121 @@ func GetBetWinLossSummary(c *fiber.Ctx) error {
 	return utils.SuccessResponse(c, results, "Bet win/loss summary retrieved successfully.")
 }
 
+func GetWinLostAlliance(c *fiber.Ctx) error {
+	var results []models.BetWinLossSummaryAlliance
+	var list []models.Reports
+
+	// รับค่าจาก Query Parameter
+	dateStart := c.Query("dateStart")
+	timeStart := c.Query("timeStart")
+	dateEnd := c.Query("dateEnd")
+	timeEnd := c.Query("timeEnd")
+	agent_id := c.Query("agent_id")
+
+	page := c.QueryInt("page", 1)
+	pageSize := c.QueryInt("pageSize", 10)
+
+	offset := (page - 1) * pageSize
+
+	// ตรวจสอบ agent_id
+	if agent_id == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error":   true,
+			"message": "agent_id is required",
+		})
+	}
+
+	// ตรวจสอบและจัดการฟอร์แมตของวันที่
+	layout := "2006-01-02 15:04:05"
+	startDateTime := fmt.Sprintf("%s %s", dateStart, timeStart)
+	endDateTime := fmt.Sprintf("%s %s", dateEnd, timeEnd)
+
+	startTime, err := time.Parse(layout, startDateTime)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error":   true,
+			"message": "Invalid dateStart or timeStart format. Expected format: YYYY-MM-DD HH:MM:SS",
+		})
+	}
+
+	endTime, err := time.Parse(layout, endDateTime)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error":   true,
+			"message": "Invalid dateEnd or timeEnd format. Expected format: YYYY-MM-DD HH:MM:SS",
+		})
+	}
+
+	if !startTime.Before(endTime) {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error":   true,
+			"message": "Start time must be earlier than end time.",
+		})
+	}
+
+	// Debug output
+	fmt.Println("Start:", startDateTime)
+	fmt.Println("End:", endDateTime)
+
+	// Query database for summary grouped by agent_id
+	if err := database.DB.Model(&models.Reports{}).
+		Select("agent_id, CAST(SUM(bet_winloss) AS FLOAT) as bet_winloss").
+		Where("agent_id = ? AND created_at >= ? AND created_at <= ?", agent_id, startDateTime, endDateTime).
+		Group("agent_id").
+		Having("SUM(bet_winloss) < 0").
+		Find(&results).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error":   true,
+			"message": "Failed to fetch bet win/loss summary: " + err.Error(),
+		})
+	}
+
+	// Query all records with pagination
+	if err := database.DB.Where("agent_id = ? AND created_at >= ? AND created_at <= ?", agent_id, startDateTime, endDateTime).
+		Order("id desc").Offset(offset).Limit(pageSize).
+		Find(&list).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error":   true,
+			"message": "Failed to fetch bet win/loss records: " + err.Error(),
+		})
+	}
+
+	// Query total count
+	var count int64
+	if err := database.DB.Model(&models.Reports{}).
+		Where("agent_id = ? AND created_at >= ? AND created_at <= ?", agent_id, startDateTime, endDateTime).
+		Count(&count).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error":   true,
+			"message": "Failed to fetch total record count: " + err.Error(),
+		})
+	}
+
+	// ตรวจสอบว่ามีผลลัพธ์หรือไม่
+	// if len(results) == 0 && len(list) == 0 {
+	// 	return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+	// 		"error":   false,
+	// 		"message": "No bet win/loss data found for the specified criteria",
+	// 	})
+	// }
+
+	// Prepare response data
+	data := map[string]interface{}{
+		"recordsTotal": count,
+		"totalSummary": results,
+		"dataList":     list,
+		"pagination": map[string]interface{}{
+			"page":      page,
+			"pageSize":  pageSize,
+			"total":     count,
+			"totalPage": (count + int64(pageSize) - 1) / int64(pageSize), // คำนวณจำนวนหน้าทั้งหมด
+		},
+	}
+
+	// Return successful response
+	return utils.SuccessResponse(c, data, "Bet win/loss summary retrieved successfully.")
+}
+
 func GetReportGame(c *fiber.Ctx) error {
 	var body models.ReportGameRequest
 	if err := c.BodyParser(&body); err != nil {
