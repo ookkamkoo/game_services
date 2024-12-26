@@ -125,9 +125,12 @@ func CheckProvider(nameBody string, operatorBody string, secretBody string) bool
 	fmt.Println("operatorBody = ", operator)
 	fmt.Println("secretBody = ", secret)
 	if nameBody == name && operatorBody == operator && secretBody == secret {
+		fmt.Println("aaaaaaa")
 		return true
 	}
+	fmt.Println("=============== CheckProvider end ===============")
 	return false
+
 }
 
 func BalanceProvider(c *fiber.Ctx) error {
