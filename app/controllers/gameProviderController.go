@@ -195,9 +195,9 @@ func BalanceProvider(c *fiber.Ctx) error {
 	}
 
 	var response fiber.Map
-	if data.Data.Status != "" {
+	if data.Data.Status == "10001" {
 		response = fiber.Map{
-			"code":         9999,
+			"code":         1000,
 			"msg":          data.Message,
 			"balance":      data.Data.Balance,
 			"responseTime": responseTime,
