@@ -456,11 +456,11 @@ func GetReportGameByCategorySumByKey(c *fiber.Ctx) error {
 
 	var sums []SumResult
 
-	var key string
+	key := c.Query("key")
 	// Perform the query with GROUP BY product_name
 	if err := database.DB.Model(&models.Reports{}).
 		Select("category_name, SUM(bet_amount) AS bet_amount, SUM(bet_result) AS bet_result, SUM(bet_winloss) AS bet_winloss").
-		Where("key_deposit ?", key).
+		Where("key_deposit = ?", key).
 		Group("category_name").
 		Scan(&sums).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
