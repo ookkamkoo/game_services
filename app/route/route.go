@@ -43,6 +43,7 @@ func SetRoute(app *fiber.App) {
 	api.Get("/getReportGameProduct", middlewares.GameSeviceMiddleware(), controllers.GetReportGameProduct)
 	api.Get("/getReportGameByProductName", middlewares.GameSeviceMiddleware(), controllers.GetReportGameByProductName)
 	api.Get("/getReportGameByProductSum", middlewares.GameSeviceMiddleware(), controllers.GetReportGameByCategorySum)
+	api.Get("/getReportGameByProductSumByKey", middlewares.GameSeviceMiddleware(), controllers.GetReportGameByCategorySumByKey)
 	api.Post("/getReportGameByCategory", middlewares.GameSeviceMiddleware(), controllers.GetReportGameByCategoryName)
 	// api.Get("/user-information/:username", controllers.UserInformation)
 

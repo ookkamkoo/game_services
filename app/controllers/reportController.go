@@ -444,6 +444,64 @@ func GetReportGameByCategorySum(c *fiber.Ctx) error {
 	return utils.SuccessResponse(c, response, "Get report game successfully.")
 }
 
+func GetReportGameByCategorySumByKey(c *fiber.Ctx) error {
+
+	// Struct for holding the sums grouped by product_name
+	type SumResult struct {
+		CategoryName string  `json:"category_name"`
+		BetAmount    float64 `json:"bet_amount"`
+		BetResult    float64 `json:"bet_result"`
+		BetWinLoss   float64 `json:"bet_winloss"`
+	}
+
+	var sums []SumResult
+
+	var key string
+	// Perform the query with GROUP BY product_name
+	if err := database.DB.Model(&models.Reports{}).
+		Select("category_name, SUM(bet_amount) AS bet_amount, SUM(bet_result) AS bet_result, SUM(bet_winloss) AS bet_winloss").
+		Where("key_deposit ?", key).
+		Group("category_name").
+		Scan(&sums).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return utils.ErrorResponse(c, http.StatusNotFound, "No records found for the specified date range.", "")
+		}
+		return utils.ErrorResponse(c, http.StatusBadRequest, "Failed to calculate sums.", err.Error())
+	}
+	// fmt.Println(sums)
+	reportData := map[string]fiber.Map{
+		"Sportsbook":      {"name": "Sportsbook", "bet_amount": 0, "bet_result": 0, "bet_winloss": 0},
+		"Live Casino":     {"name": "Live Casino", "bet_amount": 0, "bet_result": 0, "bet_winloss": 0},
+		"Slot Game":       {"name": "Slot Game", "bet_amount": 0, "bet_result": 0, "bet_winloss": 0},
+		"Fishing Hunter":  {"name": "Fishing Hunter", "bet_amount": 0, "bet_result": 0, "bet_winloss": 0},
+		"Game Card":       {"name": "Game Card", "bet_amount": 0, "bet_result": 0, "bet_winloss": 0},
+		"Lotto":           {"name": "Lotto", "bet_amount": 0, "bet_result": 0, "bet_winloss": 0},
+		"E-Sport":         {"name": "E-Sport", "bet_amount": 0, "bet_result": 0, "bet_winloss": 0},
+		"Poker Game":      {"name": "Poker Game", "bet_amount": 0, "bet_result": 0, "bet_winloss": 0},
+		"Keno":            {"name": "Keno", "bet_amount": 0, "bet_result": 0, "bet_winloss": 0},
+		"Crypto Tradding": {"name": "Crypto Trading", "bet_amount": 0, "bet_result": 0, "bet_winloss": 0},
+		"Pg100":           {"name": "Pg100", "bet_amount": 0, "bet_result": 0, "bet_winloss": 0},
+	}
+
+	for _, v := range sums {
+		if data, exists := reportData[v.CategoryName]; exists {
+			data["bet_amount"] = v.BetAmount
+			data["bet_result"] = v.BetResult
+			data["bet_winloss"] = math.Round((v.BetResult-v.BetAmount)*100) / 100
+			reportData[v.CategoryName] = data
+		}
+	}
+
+	// Prepare the response
+	response := fiber.Map{
+		"data": reportData,
+	}
+	fmt.Println(response)
+
+	// Return the response
+	return utils.SuccessResponse(c, response, "Get report game successfully.")
+}
+
 func GetReportGameByCategoryName(c *fiber.Ctx) error {
 
 	// Struct สำหรับเก็บข้อมูลการคำนวณ
