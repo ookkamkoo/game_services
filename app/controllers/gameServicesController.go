@@ -60,7 +60,8 @@ func ProductsByCategory(c *fiber.Ctx) error {
 			"error":   err.Error(),
 		})
 	}
-
+	fmt.Println("operator_token : " + operator_token)
+	fmt.Println("key : " + key)
 	encrypted, err := utils.Encrypt(operator_token, key)
 	if err != nil {
 		fmt.Println("Encryption error:", err)
