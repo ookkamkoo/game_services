@@ -30,3 +30,9 @@ go.work
 
 # End of https://www.toptal.com/developers/gitignore/api/go,dotenv
 
+# k8s
+# Ignore ConfigMap files
+configmap.yaml
+*.config.yaml
+
+

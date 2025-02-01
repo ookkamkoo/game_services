@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: game
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: game
+  template:
+    metadata:
+      labels:
+        app: game
+    spec:
+      imagePullSecrets:  # ✅ ให้ใช้ Secret ที่สร้างไว้
+        - name: dockerhub-secret
+      containers:
+        - name: game
+          image: littleweb14766/project_csn:game_services_1
+          imagePullPolicy: Always # ✅ บังคับให้ดึง Image ใหม่เสมอ
+          envFrom:
+            - configMapRef:
+                name: game-config  # ✅ ดึงค่าจาก ConfigMap (เช่น API URL, PORT)
+          ports:
+            - containerPort: 3000
+          resources:
+            limits:
+              cpu: "500m"       # จำกัด CPU ไม่เกิน 0.5 Core
+              memory: "512Mi"   # จำกัด Memory ไม่เกิน 512MB
+            requests:
+              cpu: "250m"       # ขอ CPU ขั้นต่ำ 0.25 Core
+              memory: "256Mi"   # ขอ Memory ขั้นต่ำ 256MB

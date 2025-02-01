@@ -7,13 +7,14 @@ import (
 	"fmt"
 	"game_services/app/utils"
 	"net/http"
+	"os"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-const privateURL = "https://api-test.gpsuperapi.com/api"
-const operator_token = "d5f5232e-bd91-47c7-acc9-0856b6e8a06a:bd8d067f-2623-4afb-ba5f-32896fce47a5"
-const key = "MNzLhy68lkH418xGYFE41XkKvoiRr2FX"
+// const privateURL = "https://api-test.gpsuperapi.com/api"
+// const operator_token = "d5f5232e-bd91-47c7-acc9-0856b6e8a06a:bd8d067f-2623-4afb-ba5f-32896fce47a5"
+// const key = "MNzLhy68lkH418xGYFE41XkKvoiRr2FX"
 
 type LaunchRequest struct {
 	PlayerUsername string `json:"playerUsername"`
@@ -26,7 +27,18 @@ type LaunchRequest struct {
 	AuthToken      string `json:"authToken"`
 }
 
+var privateURL string
+var operator_token string
+var key string
+
+func SetValueFormENV() {
+	privateURL = os.Getenv("PRIVATE_URL")
+	operator_token = os.Getenv("OPERATOR_TOKEN")
+	key = os.Getenv("KEY")
+}
+
 func ProductsByCategory(c *fiber.Ctx) error {
+	SetValueFormENV()
 	// Get the categoryId query parameter from the request
 	categoryId := c.Params("categoryId")
 	if categoryId == "" {
@@ -96,6 +108,7 @@ func ProductsByCategory(c *fiber.Ctx) error {
 }
 
 func GameList(c *fiber.Ctx) error {
+	SetValueFormENV()
 	// Get the categoryId query parameter from the request
 	categoryId := c.Params("categoryId")
 	productId := c.Params("productId")
@@ -189,6 +202,7 @@ func GameList(c *fiber.Ctx) error {
 }
 
 func UserInformation(c *fiber.Ctx) error {
+	SetValueFormENV()
 	// Get the categoryId query parameter from the request
 	username := c.Params("username")
 	if username == "" {
@@ -255,6 +269,7 @@ func UserInformation(c *fiber.Ctx) error {
 }
 
 func launchGameGplay(launchReq LaunchRequest) (string, error) {
+	SetValueFormENV()
 	// Parse JSON request body into LaunchRequest struct
 	fmt.Println("aaaaaaaaaaaaa")
 	// Validate required fields
@@ -333,6 +348,7 @@ func launchGameGplay(launchReq LaunchRequest) (string, error) {
 }
 
 func LaunchGames(c *fiber.Ctx) error {
+	SetValueFormENV()
 	productId := c.Params("productId")
 	if productId == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -409,6 +425,7 @@ func LaunchGames(c *fiber.Ctx) error {
 }
 
 func SettingGamePg100(c *fiber.Ctx) error {
+	SetValueFormENV()
 	var body json.RawMessage
 	if err := c.BodyParser(&body); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
