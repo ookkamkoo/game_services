@@ -159,6 +159,7 @@ func GameList(c *fiber.Ctx) error {
 
 		fmt.Println("operator_token : " + operator_token)
 		fmt.Println("key : " + key)
+		fmt.Println("url : " + url)
 
 		encrypted, err := utils.Encrypt(operator_token, key)
 		if err != nil {
