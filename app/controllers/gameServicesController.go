@@ -32,9 +32,9 @@ var operator_token string
 var key string
 
 func SetValueFormENV() {
-	privateURL = os.Getenv("PRIVATE_URL")
-	operator_token = os.Getenv("OPERATOR_TOKEN")
-	key = os.Getenv("KEY")
+	privateURL = os.Getenv("privateURL")
+	operator_token = os.Getenv("operator_token")
+	key = os.Getenv("key")
 }
 
 func ProductsByCategory(c *fiber.Ctx) error {
