@@ -274,7 +274,7 @@ func UserInformation(c *fiber.Ctx) error {
 }
 
 func launchGameGplay(launchReq LaunchRequest) (string, error) {
-	SetValueFormENV()
+	// SetValueFormENV()
 	// Parse JSON request body into LaunchRequest struct
 	fmt.Println("aaaaaaaaaaaaa")
 	// Validate required fields
