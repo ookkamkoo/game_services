@@ -409,6 +409,7 @@ func LaunchGames(c *fiber.Ctx) error {
 		fmt.Println("inqqqqqqqqqqqqqqqqqq")
 		gameUrl, err := launchGameGplay(launchReq)
 		if err != nil {
+			fmt.Println(err)
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"status":  "error",
 				"message": err.Error(),
