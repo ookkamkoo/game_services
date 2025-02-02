@@ -630,7 +630,7 @@ func CreditProvider(c *fiber.Ctx) error {
 				fmt.Println("Error saving report:", err)
 				return err
 			}
-		} else if req.CategoryName == "Slot Game" {
+		} else if req.ProductName != "PGSOFT" {
 			var report models.Reports
 			report.UserID = data.Data.UserID
 			report.Username = data.Data.Username
