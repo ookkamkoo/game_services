@@ -122,10 +122,10 @@ func CheckProvider(nameBody string, operatorBody string, secretBody string) bool
 
 	// fmt.Println("nameBody = ", nameBody)
 	// fmt.Println("name = ", name)
-	// fmt.Println("operatorBody = ", operatorBody)
-	// fmt.Println("operator = ", operator)
-	// fmt.Println("secretBody = ", secretBody)
-	// fmt.Println("secret = ", secret)
+	fmt.Println("operatorBody = ", operatorBody)
+	fmt.Println("operator = ", operator)
+	fmt.Println("secretBody = ", secretBody)
+	fmt.Println("secret = ", secret)
 	if operatorBody != operator || secretBody != secret {
 		return true
 	}
