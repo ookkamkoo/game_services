@@ -168,6 +168,8 @@ func GameList(c *fiber.Ctx) error {
 			fmt.Println("Encryption error:", err)
 			return err
 		}
+
+		fmt.Println("encrypted : " + encrypted)
 		req.Header.Set("X-Authorization-Token", encrypted)
 		client := http.Client{}
 		resp, err := client.Do(req)
