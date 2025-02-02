@@ -33,7 +33,9 @@ var key string
 
 func SetValueFormENV() {
 	privateURL = os.Getenv("privateURL")
-	operator_token = os.Getenv("operator_token")
+	operatorToken := os.Getenv("operatorToken")
+	seamlessKey := os.Getenv("seamlessKey")
+	operator_token = operatorToken + ":" + seamlessKey
 	key = os.Getenv("key")
 }
 
