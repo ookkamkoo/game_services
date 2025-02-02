@@ -400,6 +400,7 @@ func LaunchGames(c *fiber.Ctx) error {
 	} else {
 		var launchReq LaunchRequest
 		if err := c.BodyParser(&launchReq); err != nil {
+			fmt.Println(err)
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"status":  "error",
 				"message": "Invalid request payload",
