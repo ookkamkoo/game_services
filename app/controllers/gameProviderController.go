@@ -156,6 +156,7 @@ func BalanceProvider(c *fiber.Ctx) error {
 			"responseTime": responseTime,
 			"responseUid":  req.RequestUid,
 		}
+		fmt.Println(response)
 		return c.JSON(response)
 	}
 
@@ -167,6 +168,7 @@ func BalanceProvider(c *fiber.Ctx) error {
 			"responseTime": responseTime,
 			"responseUid":  req.RequestUid,
 		}
+		fmt.Println(response)
 		return c.JSON(response)
 	}
 
