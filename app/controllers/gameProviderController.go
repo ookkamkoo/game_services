@@ -630,6 +630,32 @@ func CreditProvider(c *fiber.Ctx) error {
 				fmt.Println("Error saving report:", err)
 				return err
 			}
+		} else if req.CategoryName == "Slot Game" {
+			var report models.Reports
+			report.UserID = data.Data.UserID
+			report.Username = data.Data.Username
+			report.KeyDeposit = data.Data.KeyDeposit
+			report.CategoryName = req.CategoryName
+			report.AgentID = data.Data.AgentID
+			report.RoundId = req.RoundId
+			report.RoundCheck = req.RoundId
+			report.ProductId = req.ProductName
+			report.ProductName = req.ProductName
+			report.GameId = req.GameCode
+			report.GameName = req.GameName
+			report.WalletAmountBefore = data.Data.BalanceBefore + (sumGplay.SumBetAmount - sumGplay.SumPayoutAmount)
+			report.WalletAmountAfter = data.Data.BalanceAfter
+			report.BetAmount = sumGplay.SumBetAmount
+			report.BetResult = sumGplay.SumPayoutAmount
+			report.BetWinloss = winLoss
+			report.Status = status
+			report.IP = utils.GetIP()
+			report.Description = ""
+			report.CreatedAt = time.Now()
+			if err := database.DB.Create(&report).Error; err != nil {
+				fmt.Println("Error saving report:", err)
+				return err
+			}
 		}
 	}
 
