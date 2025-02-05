@@ -33,9 +33,9 @@ func main() {
 
 	if err := database.PG_Connect(); err != nil {
 		log.Fatal(err)
-	} else {
-		route.SetRoute(app)
 	}
+
+	route.SetRoute(app)
 
 	app.Listen(":3003")
 }
