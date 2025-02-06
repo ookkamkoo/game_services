@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"sync"
+	"time"
 
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
@@ -57,15 +58,17 @@ func PG_Connect() error {
 		if err != nil {
 			log.Fatal("❌ Failed to get database connection: ", err)
 		}
-		if err = sqlDB.Ping(); err != nil {
-			log.Fatal("❌ Database is not responding: ", err)
-		}
 
 		// ✅ กำหนด Connection Pool
-		sqlDB.SetMaxOpenConns(10)     // จำนวน Connection สูงสุดที่เปิดพร้อมกัน
-		sqlDB.SetMaxIdleConns(5)      // จำนวน Connection ที่เปิดทิ้งไว้
-		sqlDB.SetConnMaxIdleTime(300) // เวลาสูงสุดที่ Connection อยู่ในสถานะ Idle
-		sqlDB.SetConnMaxLifetime(900) // เวลาสูงสุดของ Connection ก่อนถูกปิด
+		// sqlDB.SetMaxOpenConns(100)    // จำนวน Connection สูงสุดที่เปิดพร้อมกัน
+		// sqlDB.SetMaxIdleConns(5)      // จำนวน Connection ที่เปิดทิ้งไว้
+		// sqlDB.SetConnMaxIdleTime(300) // เวลาสูงสุดที่ Connection อยู่ในสถานะ Idle
+		// sqlDB.SetConnMaxLifetime(900) // เวลาสูงสุดของ Connection ก่อนถูกปิด
+
+		sqlDB.SetMaxIdleConns(5)                  // ✅ จำกัดจำนวน Connection ที่ว่างไว้สูงสุด 10
+		sqlDB.SetMaxOpenConns(100)                // ✅ จำกัดจำนวน Connection ที่เปิดพร้อมกันสูงสุด 100
+		sqlDB.SetConnMaxIdleTime(2 * time.Minute) // time idle
+		sqlDB.SetConnMaxLifetime(5 * time.Minute) // ✅ Connection แต่ละตัวสามารถใช้ได้นานสุด 1 ชั่วโมง
 
 		log.Println("✅ Connected to Database")
 		DB = db
