@@ -30,6 +30,9 @@ func GetBetWinLossSummary(c *fiber.Ctx) error {
 		})
 	}
 
+	currentTime := time.Now()
+	fmt.Println("🕒 เวลาปัจจุบัน:", currentTime)
+
 	// Get yesterday's start and end times in the specified time zone
 	now := time.Now().In(location)
 	yesterday := now.AddDate(0, 0, -1)
