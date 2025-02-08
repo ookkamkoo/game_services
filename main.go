@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -23,6 +25,13 @@ func main() {
 		AllowMethods: "GET, POST, PUT, DELETE, HEAD, PATCH",
 		MaxAge:       3600,
 	}))
+
+	loc, err := time.LoadLocation("Asia/Bangkok")
+	if err != nil {
+		fmt.Println("Error loading timezone:", err)
+		return
+	}
+	time.Local = loc
 
 	// Connect  Database
 	// err := godotenv.Load()
