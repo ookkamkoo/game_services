@@ -60,6 +60,7 @@ func SetRoute(app *fiber.App) {
 	gameProvider.Post("/reward", controllers.RewardProvider)
 }
 
+// update
 func migrateHandler(c *fiber.Ctx) error {
 	// Run migrations
 	migration.RunMigration()
