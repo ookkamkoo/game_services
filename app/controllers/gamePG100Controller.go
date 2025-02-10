@@ -323,6 +323,7 @@ func PGLaunchGames(data BodyLoginPG) (map[string]interface{}, error) {
 	apiKey := os.Getenv("apiKey")
 	url := fmt.Sprintf("%s/seamless/api/v2/login", privateURLPG100)
 	fmt.Println("sssssssssss")
+	fmt.Println(url)
 	// fmt.Println(data.Username)
 	// Marshal the data to JSON
 	now := time.Now()
