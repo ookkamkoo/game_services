@@ -372,6 +372,7 @@ func PGLaunchGames(data BodyLoginPG) (map[string]interface{}, error) {
 		return nil, fmt.Errorf("failed to decode response body: %v", err)
 	}
 	fmt.Println(responseMap)
+	fmt.Println(resp.Body)
 	return responseMap, nil
 }
 
