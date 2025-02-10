@@ -5,6 +5,7 @@ import (
 	"game_services/app/database"
 	"game_services/app/models"
 	"game_services/app/utils"
+	"log"
 	"math"
 	"net/http"
 	"time"
@@ -371,9 +372,8 @@ func GetReportGameByProductName(c *fiber.Ctx) error {
 }
 
 func GetReportGameByCategorySum(c *fiber.Ctx) error {
-
-	// Struct for holding the sums grouped by product_name
 	type SumResult struct {
+		ReportDate   string  `json:"report_date"` // เพิ่มฟิลด์สำหรับวันที่
 		CategoryName string  `json:"category_name"`
 		BetAmount    float64 `json:"bet_amount"`
 		BetResult    float64 `json:"bet_result"`
@@ -382,68 +382,94 @@ func GetReportGameByCategorySum(c *fiber.Ctx) error {
 
 	var sums []SumResult
 
-	// Retrieve and validate query parameters
+	// รับค่าพารามิเตอร์วันที่จาก query
 	dateTimeStart := c.Query("dateTimeStart")
 	dateTimeEnd := c.Query("dateTimeEnd")
 
-	// Check if dates are provided
 	if dateTimeStart == "" || dateTimeEnd == "" {
 		return utils.ErrorResponse(c, http.StatusBadRequest, "Missing required date parameters.", "dateTimeStart or dateTimeEnd is missing.")
 	}
 
-	// Optional: Parse dates to ensure they are valid (assuming format "2006-01-02 15:04:05")
-	_, err := time.Parse("2006-01-02 15:04:05", dateTimeStart)
+	// ตั้งค่าโซนเวลาเป็น Asia/Bangkok
+	loc, err := time.LoadLocation("Asia/Bangkok")
+	if err != nil {
+		log.Println("❌ Error loading timezone:", err)
+		return utils.ErrorResponse(c, http.StatusInternalServerError, "Failed to load timezone.", err.Error())
+	}
+
+	// แปลง string → time.Time โดยใช้ `time.ParseInLocation`
+	startTime, err := time.ParseInLocation("2006-01-02 15:04:05", dateTimeStart, loc)
 	if err != nil {
 		return utils.ErrorResponse(c, http.StatusBadRequest, "Invalid dateTimeStart format.", err.Error())
 	}
-	_, err = time.Parse("2006-01-02 15:04:05", dateTimeEnd)
+	endTime, err := time.ParseInLocation("2006-01-02 15:04:05", dateTimeEnd, loc)
 	if err != nil {
 		return utils.ErrorResponse(c, http.StatusBadRequest, "Invalid dateTimeEnd format.", err.Error())
 	}
-	fmt.Println(dateTimeStart)
-	fmt.Println(dateTimeEnd)
-	// Perform the query with GROUP BY product_name
+
+	// Debug log
+	fmt.Println("✅ Start Time:", startTime)
+	fmt.Println("✅ End Time:", endTime)
+
+	// Query database โดยใช้ GROUP BY วันที่ และ category_name
 	if err := database.DB.Model(&models.Reports{}).
-		Select("category_name, SUM(bet_amount) AS bet_amount, SUM(bet_result) AS bet_result, SUM(bet_winloss) AS bet_winloss").
-		Where("created_at BETWEEN ? AND ?", dateTimeStart, dateTimeEnd).
-		Group("category_name").
+		Select("DATE(created_at) AS report_date, COALESCE(category_name, 'Unknown') AS category_name, SUM(bet_amount) AS bet_amount, SUM(bet_result) AS bet_result, SUM(bet_winloss) AS bet_winloss").
+		Where("created_at BETWEEN ? AND ?", startTime, endTime).
+		Group("report_date, category_name").
+		Order("report_date ASC, category_name ASC").
 		Scan(&sums).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return utils.ErrorResponse(c, http.StatusNotFound, "No records found for the specified date range.", "")
 		}
 		return utils.ErrorResponse(c, http.StatusBadRequest, "Failed to calculate sums.", err.Error())
 	}
-	// fmt.Println(sums)
-	reportData := map[string]fiber.Map{
-		"Sportsbook":      {"name": "Sportsbook", "bet_amount": 0, "bet_result": 0, "bet_winloss": 0},
-		"Live Casino":     {"name": "Live Casino", "bet_amount": 0, "bet_result": 0, "bet_winloss": 0},
-		"Slot Game":       {"name": "Slot Game", "bet_amount": 0, "bet_result": 0, "bet_winloss": 0},
-		"Fishing Hunter":  {"name": "Fishing Hunter", "bet_amount": 0, "bet_result": 0, "bet_winloss": 0},
-		"Game Card":       {"name": "Game Card", "bet_amount": 0, "bet_result": 0, "bet_winloss": 0},
-		"Lotto":           {"name": "Lotto", "bet_amount": 0, "bet_result": 0, "bet_winloss": 0},
-		"E-Sport":         {"name": "E-Sport", "bet_amount": 0, "bet_result": 0, "bet_winloss": 0},
-		"Poker Game":      {"name": "Poker Game", "bet_amount": 0, "bet_result": 0, "bet_winloss": 0},
-		"Keno":            {"name": "Keno", "bet_amount": 0, "bet_result": 0, "bet_winloss": 0},
-		"Crypto Tradding": {"name": "Crypto Trading", "bet_amount": 0, "bet_result": 0, "bet_winloss": 0},
-		"Pg100":           {"name": "Pg100", "bet_amount": 0, "bet_result": 0, "bet_winloss": 0},
+
+	// โครงสร้างข้อมูลสำหรับเก็บรายงานแยกตามวัน
+	reportData := make(map[string]map[string]fiber.Map)
+
+	// หมวดหมู่เริ่มต้นที่ต้องการให้แสดง
+	defaultCategories := []string{
+		"Sportsbook", "Live Casino", "Slot Game", "Fishing Hunter", "Game Card",
+		"Lotto", "E-Sport", "Poker Game", "Keno", "Crypto Trading", "Pg100",
 	}
 
-	for _, v := range sums {
-		if data, exists := reportData[v.CategoryName]; exists {
-			data["bet_amount"] = v.BetAmount
-			data["bet_result"] = v.BetResult
-			data["bet_winloss"] = math.Round((v.BetResult-v.BetAmount)*100) / 100
-			reportData[v.CategoryName] = data
+	// สร้างโครงสร้างข้อมูลให้แต่ละวันมีหมวดหมู่เกมครบถ้วน
+	for _, record := range sums {
+		reportDate := record.ReportDate
+
+		// ตรวจสอบว่า key วันที่มีอยู่ใน map หรือไม่
+		if _, exists := reportData[reportDate]; !exists {
+			reportData[reportDate] = make(map[string]fiber.Map)
+
+			// เพิ่มหมวดหมู่เริ่มต้นให้กับวันที่นั้น
+			for _, category := range defaultCategories {
+				reportData[reportDate][category] = fiber.Map{
+					"name":        category,
+					"bet_amount":  0.0,
+					"bet_result":  0.0,
+					"bet_winloss": 0.0,
+				}
+			}
+		}
+
+		// อัปเดตค่าผลรวมที่ดึงมา
+		reportData[reportDate][record.CategoryName] = fiber.Map{
+			"name":        record.CategoryName,
+			"bet_amount":  record.BetAmount,
+			"bet_result":  record.BetResult,
+			"bet_winloss": math.Round((record.BetResult-record.BetAmount)*100) / 100,
 		}
 	}
 
-	// Prepare the response
+	// Debug log
+	fmt.Println("📊 Report Data:", reportData)
+
+	// เตรียม response
 	response := fiber.Map{
 		"data": reportData,
 	}
-	fmt.Println(response)
 
-	// Return the response
+	// ส่ง response
 	return utils.SuccessResponse(c, response, "Get report game successfully.")
 }
 

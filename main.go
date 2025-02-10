@@ -26,6 +26,7 @@ func main() {
 		MaxAge:       3600,
 	}))
 
+	// settime zone
 	loc, err := time.LoadLocation("Asia/Bangkok")
 	if err != nil {
 		fmt.Println("Error loading timezone:", err)
