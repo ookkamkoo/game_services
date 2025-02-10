@@ -375,8 +375,11 @@ func PGLaunchGames(data BodyLoginPG) (map[string]interface{}, error) {
 
 func PGSettingGame(data json.RawMessage) error {
 	// url := fmt.Sprintf("%s/seamless/api/v2/setGameSetting", privateURLPG100)
-	url := "https://agent-api.u17fz.com/seamless/api/v2/setGameSetting"
-	apiKey := "OWJxTzlTNzdCRzpWWXVjZ200emhjcGFiTnZ3YzlTNWR3YWhXWk1HMmNpOQ=="
+	// url := "https://agent-api.u17fz.com/seamless/api/v2/setGameSetting"
+	// apiKey := "OWJxTzlTNzdCRzpWWXVjZ200emhjcGFiTnZ3YzlTNWR3YWhXWk1HMmNpOQ=="
+	privateURLPG100 := os.Getenv("PRIVATE_URL_PG100")
+	apiKey := os.Getenv("apiKey")
+	url := fmt.Sprintf("%s/seamless/api/v2/setGameSetting", privateURLPG100)
 	fmt.Println(url)
 	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(data))
 	if err != nil {
