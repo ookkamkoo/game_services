@@ -46,6 +46,9 @@ func SetRoute(app *fiber.App) {
 	api.Get("/getReportGameByProductSum", middlewares.GameSeviceMiddleware(), controllers.GetReportGameByCategorySum)
 	api.Get("/getReportGameByProductSumByKey", middlewares.GameSeviceMiddleware(), controllers.GetReportGameByCategorySumByKey)
 	api.Post("/getReportGameByCategory", middlewares.GameSeviceMiddleware(), controllers.GetReportGameByCategoryName)
+
+	//
+	api.Post("/verifyAgentApiKey", middlewares.GameSeviceMiddleware(), controllers.VerifyAgent)
 	// api.Get("/user-information/:username", controllers.UserInformation)
 
 	// Gplay call back

@@ -415,3 +415,52 @@ func PGSettingGame(data json.RawMessage) error {
 	fmt.Println(responseMap)
 	return nil
 }
+
+func VerifyAgent(c *fiber.Ctx) error {
+	privateURLPG100 := os.Getenv("PRIVATE_URL_PG100")
+	apiKey := os.Getenv("apiKey")
+	url := fmt.Sprintf("%s/seamless/api/v2/verifyAgentApiKey", privateURLPG100)
+	fmt.Println(url)
+	data := map[string]string{
+		"agentId": "67a8d2a047f40ca8e0dd270f",
+		"apiKey":  "cbwlMKYTC3huQHAPqQfw912bQHWvKfru",
+	}
+
+	// 🔄 แปลง struct เป็น JSON
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		fmt.Println("Error marshalling JSON:", err)
+		return err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonData))
+	if err != nil {
+		return fmt.Errorf("failed to create HTTP request: %v", err)
+	}
+
+	// Set the required headers
+	req.Header.Set("x-api-key", apiKey)
+	req.Header.Set("Content-Type", "application/json")
+
+	// Execute the HTTP request
+	client := http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to send HTTP request: %v", err)
+	}
+	defer resp.Body.Close()
+
+	// Check the response status code
+	fmt.Println("PGSettingGame = ", resp.StatusCode)
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	}
+
+	// Decode the response body into a JSON map
+	var responseMap map[string]interface{}
+	if err := json.NewDecoder(resp.Body).Decode(&responseMap); err != nil {
+		return fmt.Errorf("failed to decode response body: %v", err)
+	}
+	fmt.Println(responseMap)
+	return nil
+}
