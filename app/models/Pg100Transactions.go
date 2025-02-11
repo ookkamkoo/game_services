@@ -2,6 +2,11 @@ package models
 
 import "time"
 
+type VerifyAgent struct {
+	AgentId string `json:"agentId"`
+	ApiKey  string `json:"apiKey"`
+}
+
 type BalanceCheckResponse struct {
 	ID              string  `json:"id"`
 	StatusCode      int     `json:"statusCode"`

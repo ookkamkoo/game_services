@@ -419,11 +419,20 @@ func PGSettingGame(data json.RawMessage) error {
 func VerifyAgent(c *fiber.Ctx) error {
 	privateURLPG100 := os.Getenv("PRIVATE_URL_PG100")
 	apiKey := os.Getenv("apiKey")
+
+	var body models.VerifyAgent
+	if err := c.BodyParser(&body); err != nil {
+		fmt.Println(err)
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid request body",
+		})
+	}
+
 	url := fmt.Sprintf("%s/seamless/api/v2/verifyAgentApiKey", privateURLPG100)
 	fmt.Println(url)
 	data := map[string]string{
-		"agentId": "67a8d2a047f40ca8e0dd270f",
-		"apiKey":  "cbwlMKYTC3huQHAPqQfw912bQHWvKfru",
+		"agentId": body.AgentId,
+		"apiKey":  body.ApiKey,
 	}
 
 	// 🔄 แปลง struct เป็น JSON
@@ -462,5 +471,5 @@ func VerifyAgent(c *fiber.Ctx) error {
 		return fmt.Errorf("failed to decode response body: %v", err)
 	}
 	fmt.Println(responseMap)
-	return nil
+	return c.JSON(responseMap)
 }
