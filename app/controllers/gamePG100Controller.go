@@ -290,15 +290,15 @@ func settleServer(amount float32, username string, is_refund bool) (models.Respo
 	return responseMap, nil
 }
 
-func PGGameList() (map[string]interface{}, error) {
+func PGGameList(body BodyLoginPG) (map[string]interface{}, error) {
 	privateURLPG100 := os.Getenv("PRIVATE_URL_PG100")
-	apiKey := os.Getenv("apiKey")
+	// apiKey := os.Getenv("apiKey")
 	url := fmt.Sprintf("%s/seamless/api/v2/games", privateURLPG100)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("x-api-key", apiKey)
+	req.Header.Set("x-api-key", body.XApiKey)
 
 	client := http.Client{}
 	resp, err := client.Do(req)
@@ -323,11 +323,11 @@ func PGGameList() (map[string]interface{}, error) {
 
 func PGLaunchGames(data BodyLoginPG) (map[string]interface{}, error) {
 	privateURLPG100 := os.Getenv("PRIVATE_URL_PG100")
-	apiKey := os.Getenv("apiKey")
+	// apiKey := os.Getenv("apiKey")
 	url := fmt.Sprintf("%s/seamless/api/v2/login", privateURLPG100)
 	fmt.Println("sssssssssss")
 	fmt.Println(url)
-	fmt.Println(apiKey)
+	// fmt.Println(apiKey)
 	// fmt.Println(data.Username)
 	// Marshal the data to JSON
 	now := time.Now()
@@ -352,7 +352,7 @@ func PGLaunchGames(data BodyLoginPG) (map[string]interface{}, error) {
 	}
 
 	// Set the required headers
-	req.Header.Set("x-api-key", apiKey)
+	req.Header.Set("x-api-key", data.XApiKey)
 	req.Header.Set("Content-Type", "application/json")
 
 	// Execute the HTTP request
@@ -379,12 +379,12 @@ func PGLaunchGames(data BodyLoginPG) (map[string]interface{}, error) {
 	return responseMap, nil
 }
 
-func PGSettingGame(data json.RawMessage) error {
+func PGSettingGame(data json.RawMessage, apiKey string) error {
 	// url := fmt.Sprintf("%s/seamless/api/v2/setGameSetting", privateURLPG100)
 	// url := "https://agent-api.u17fz.com/seamless/api/v2/setGameSetting"
 	// apiKey := "OWJxTzlTNzdCRzpWWXVjZ200emhjcGFiTnZ3YzlTNWR3YWhXWk1HMmNpOQ=="
 	privateURLPG100 := os.Getenv("PRIVATE_URL_PG100")
-	apiKey := os.Getenv("apiKey")
+	// apiKey := os.Getenv("apiKey")
 	url := fmt.Sprintf("%s/seamless/api/v2/setGameSetting", privateURLPG100)
 	fmt.Println(url)
 	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(data))

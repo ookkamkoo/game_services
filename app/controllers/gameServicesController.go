@@ -130,8 +130,16 @@ func GameList(c *fiber.Ctx) error {
 	}
 
 	if productId == "pg100" {
+		var body BodyLoginPG
+		if err := c.BodyParser(&body); err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"status":  "error",
+				"message": "Invalid request payload",
+				"error":   err.Error(),
+			})
+		}
 
-		data, err := PGGameList()
+		data, err := PGGameList(body)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"status":  "error",
@@ -386,7 +394,7 @@ func LaunchGames(c *fiber.Ctx) error {
 			})
 		}
 
-		err = PGSettingGame(body.Setting)
+		err = PGSettingGame(body.Setting, body.XApiKey)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"status":  "error",
@@ -435,27 +443,27 @@ func LaunchGames(c *fiber.Ctx) error {
 	}
 }
 
-func SettingGamePg100(c *fiber.Ctx) error {
-	SetValueFormENV()
-	var body json.RawMessage
-	if err := c.BodyParser(&body); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"status":  "error",
-			"message": "Invalid request payload",
-			"error":   err.Error(),
-		})
-	}
+// func SettingGamePg100(c *fiber.Ctx) error {
+// 	SetValueFormENV()
+// 	var body json.RawMessage
+// 	if err := c.BodyParser(&body); err != nil {
+// 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+// 			"status":  "error",
+// 			"message": "Invalid request payload",
+// 			"error":   err.Error(),
+// 		})
+// 	}
 
-	fmt.Println("gameConfigJSON:", string(body))
-	err := PGSettingGame(body)
+// 	fmt.Println("gameConfigJSON:", string(body))
+// 	err := PGSettingGame(body)
 
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"status":  "error",
-			"message": "Error Setting Game",
-			"error":   err.Error(),
-		})
-	}
+// 	if err != nil {
+// 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+// 			"status":  "error",
+// 			"message": "Error Setting Game",
+// 			"error":   err.Error(),
+// 		})
+// 	}
 
-	return utils.SuccessResponse(c, "success", "success")
-}
+// 	return utils.SuccessResponse(c, "success", "success")
+// }
