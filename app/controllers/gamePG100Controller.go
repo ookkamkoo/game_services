@@ -71,7 +71,7 @@ func CheckBalancePG(c *fiber.Ctx) error {
 
 func getBalanceServer(username string) (models.ResponseData, error) {
 	urlBankend := os.Getenv("urlBankend")
-	// apiKeyBankend := os.Getenv("apiKeyBankend")
+	apiKeyBankend := os.Getenv("apiKeyBankend")
 
 	url := fmt.Sprintf("%s/getBalance", urlBankend)
 	// url := "http://127.0.0.1:3001/services-game/getBalance"
@@ -249,7 +249,7 @@ func SettleBetsPG(c *fiber.Ctx) error {
 }
 
 func settleServer(amount float32, username string, is_refund bool) (models.ResponseDataSettle, error) {
-	// apiKeyBankend := os.Getenv("apiKeyBankend")
+	apiKeyBankend := os.Getenv("apiKeyBankend")
 	urlBankend := os.Getenv("urlBankend")
 	url := fmt.Sprintf("%s/settleGame", urlBankend)
 	// fmt.Println("betAmount = ", betAmount)
