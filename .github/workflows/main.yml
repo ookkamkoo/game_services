@@ -63,8 +63,8 @@ jobs:
       # ✅ Sync Application หลังจาก Build เสร็จ
       - name: Sync ArgoCD Application
         run: |
-          argocd app sync api --prune --force
-          argocd app wait api --health  
+          argocd app sync game --prune --force
+          argocd app wait game --health  
 
 
       
