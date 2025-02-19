@@ -34,48 +34,37 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_NAME }}/project_csn:game_services_1
 
-  # deploy:
-  #   runs-on: ubuntu-latest
-  #   needs: build
+  deploy:
 
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
+    runs-on: ubuntu-latest
+    needs: build 
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-  #     # ✅ ใช้ KUBECONFIG จาก Secret
-  #     - name: Set up KUBECONFIG
-  #       run: |
-  #         mkdir -p $HOME/.kube
-  #         echo "${{ secrets.KUBECONFIG }}" | base64 --decode > $HOME/.kube/config
-  #         export KUBECONFIG=$HOME/.kube/config
-  #         chmod 600 $HOME/.kube/config
-  #         echo "✅ KUBECONFIG set up successfully."
-          
+      # ✅ ติดตั้ง ArgoCD CLI
+      - name: Install ArgoCD CLI
+        run: |
+          curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+          chmod +x argocd-linux-amd64
+          sudo mv argocd-linux-amd64 /usr/local/bin/argocd
+          argocd version --client  # ✅ ตรวจสอบว่า ArgoCD ติดตั้งสำเร็จ
 
-  #     # # ✅ อัปเดต Image ในทุก Cluster
-  #     - name: Deploy to all clusters
-  #       run: |
-  #           kubectl delete pod -l app=game
-  #           kubectl set image deployment/game game=${{ secrets.DOCKER_NAME }}/project_csn:game_services_1
-  #           kubectl rollout status deployment/game
+      # ✅ Login เข้า ArgoCD ด้วย Username/Password
+      - name: Login to ArgoCD
+        run: |
+          argocd login ${{ secrets.ARGOCD_SERVER }} \
+            --username ${{ secrets.ARGOCD_USERNAME }} \
+            --password ${{ secrets.ARGOCD_PASSWORD }} \
+            --insecure --grpc-web --skip-test-tls
 
-  #       # ✅ ตรวจสอบ Context และเชื่อมต่อ Kubernetes
-  #     - name: Check Kubernetes Connection
-  #       run: |
-  #         echo "🔍 Checking available Kubernetes contexts..."
-  #         kubectl config get-contexts || echo "⚠️ Failed to retrieve contexts"
 
-  #         echo "🔍 Checking current Kubernetes context..."
-  #         kubectl config current-context || echo "⚠️ No context is set"
-
-  #         echo "🔍 Checking cluster information..."
-  #         kubectl cluster-info || echo "❌ Failed to connect to Kubernetes API server"
-
-  #     # ✅ แสดง Pods ที่ทำงานอยู่ในทุก Namespace
-  #     - name: Show all running pods
-  #       run: |
-  #         echo "🔍 Showing all running Pods..."
-  #         kubectl get pods --all-namespaces -o wide || echo "⚠️ Failed to retrieve pods"   
+      # ✅ Sync Application หลังจาก Build เสร็จ
+      - name: Sync ArgoCD Application
+        run: |
+          argocd app sync api --prune --force
+          argocd app wait api --health  
 
 
       
