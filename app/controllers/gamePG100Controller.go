@@ -25,7 +25,7 @@ type BodyLoginPG struct {
 	Setting      json.RawMessage `json:"setting"`
 }
 
-var apiKeyBankend string
+// var apiKeyBankend string
 
 func CheckBalancePG(c *fiber.Ctx) error {
 	startTime := time.Now()
@@ -133,7 +133,7 @@ func SettleBetsPG(c *fiber.Ctx) error {
 	fmt.Println("body = ", body)
 	// find user
 	amountSettle := body.Transactions[0].PayoutAmount - body.Transactions[0].BetAmount
-	data, err := settleServer(amountSettle, body.Username, false)
+	data, err := settleServer(amountSettle, body.Transactions[0].BetAmount, body.Username, false)
 	if err != nil {
 		fmt.Println("Error retrieving balance:", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -248,7 +248,7 @@ func SettleBetsPG(c *fiber.Ctx) error {
 	return c.JSON(resq)
 }
 
-func settleServer(amount float32, username string, is_refund bool) (models.ResponseDataSettle, error) {
+func settleServer(amount float32, bet float32, username string, is_refund bool) (models.ResponseDataSettle, error) {
 	apiKeyBankend := os.Getenv("API_KEY_BACKEND")
 	urlBankend := os.Getenv("urlBankend")
 	url := fmt.Sprintf("%s/settleGame", urlBankend)
@@ -257,6 +257,7 @@ func settleServer(amount float32, username string, is_refund bool) (models.Respo
 	reqBody, err := json.Marshal(map[string]interface{}{
 		"username":  username,
 		"betsettle": amount,
+		"bet":       bet,
 		"is_refund": is_refund,
 	})
 	if err != nil {
