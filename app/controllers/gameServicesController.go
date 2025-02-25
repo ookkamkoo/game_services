@@ -208,6 +208,7 @@ func GameList(c *fiber.Ctx) error {
 				"error":   err.Error(),
 			})
 		}
+		fmt.Println(responseMap)
 
 		// Return the response map
 		return c.JSON(fiber.Map{
