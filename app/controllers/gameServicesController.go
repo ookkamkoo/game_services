@@ -447,6 +447,7 @@ func LaunchGames(c *fiber.Ctx) error {
 func Setting100GamesByUser(c *fiber.Ctx) error {
 	var body BodyLoginPG
 	fmt.Println(body.Setting)
+	fmt.Println(body.XApiKey)
 	err := PGSettingGame(body.Setting, body.XApiKey)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
