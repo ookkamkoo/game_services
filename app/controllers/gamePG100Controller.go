@@ -406,11 +406,11 @@ func PGSettingGame(data json.RawMessage, apiKey string) error {
 	defer resp.Body.Close()
 
 	// Decode the response body into a JSON map
-	var responseMaps map[string]interface{}
-	if err := json.NewDecoder(resp.Body).Decode(&responseMaps); err != nil {
-		return fmt.Errorf("failed to decode response body: %v", err)
-	}
-	fmt.Println(responseMaps)
+	// var responseMaps map[string]interface{}
+	// if err := json.NewDecoder(resp.Body).Decode(&responseMaps); err != nil {
+	// 	return fmt.Errorf("failed to decode response body: %v", err)
+	// }
+	// fmt.Println(responseMaps)
 
 	// Check the response status code
 	fmt.Println("PGSettingGame = ", resp.StatusCode)
