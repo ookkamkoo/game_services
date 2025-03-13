@@ -35,6 +35,8 @@ func SetRoute(app *fiber.App) {
 	api.Post("/game-list/:categoryId/:productId", middlewares.GameSeviceMiddleware(), controllers.GameList)
 	// api.Post("/launch-game", controllers.LaunchGame)
 	api.Post("/launch-games/:productId", middlewares.GameSeviceMiddleware(), controllers.LaunchGames)
+
+	api.Post("/update-setting/pg100", middlewares.GameSeviceMiddleware(), controllers.LaunchGames)
 	api.Post("/verifyAgent", middlewares.GameSeviceMiddleware(), controllers.VerifyAgent)
 	// api.Post("/settingPg", controllers.SettingGamePg100)
 	api.Get("/getRefoundLost", middlewares.GameSeviceMiddleware(), controllers.GetBetWinLossSummary)
