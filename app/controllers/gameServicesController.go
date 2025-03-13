@@ -446,8 +446,13 @@ func LaunchGames(c *fiber.Ctx) error {
 
 func Setting100GamesByUser(c *fiber.Ctx) error {
 	var body BodyLoginPG
-	fmt.Println("Setting = ", body.Setting)
-	fmt.Println("XApiKey = ", body.XApiKey)
+	if err := c.BodyParser(&body); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"status":  "error",
+			"message": "Invalid request payload",
+			"error":   err.Error(),
+		})
+	}
 	err := PGSettingGame(body.Setting, body.XApiKey)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
